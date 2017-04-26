@@ -1,6 +1,6 @@
-#include "../includes/States.h"
-#include "../includes/Automat.h"
-#include "../../Shared/includes/String.h"
+#include "States.h"
+#include "Automat.h"
+#include "String.h"
 #include <iostream>
 
 State::State(bool isAcceptable, const char& letter) : _isAcceptable(isAcceptable), _lexem(new String(letter)){
@@ -71,10 +71,8 @@ bool isAcceptableSign(const char& c) {
 //------------------------------------------------------------------------------------------------------------------------------------
 void StateInit::processChar(const char& c, Automat* automat) {
 	if (isDigit(c)) {
-
 		automat->changeState(new StateInteger(c));
 	} else if (isLetter(c)) {
-
 		automat->changeState(new StateIdentifier(c));
 	} else if (isAcceptableSign(c)) {
 		if (c == ':') {
@@ -128,6 +126,7 @@ void StateIdentifier::createToken(Automat* automat) {
 	if (_lexem->getSize() <= MAX_CHAR_COUNT) {
 		automat->getScanner()->mkToken(TokenIdentifier, _lexem);
 	} else {
+		//should be _lexem + $?
 		automat->getScanner()->mkToken(TokenLengthExceeded, new String("$"));
 	}
 }
@@ -150,7 +149,6 @@ void StateInteger::createToken(Automat* automat) {
 	} else {
 		automat->getScanner()->mkToken(TokenLengthExceeded, new String("$"));
 	}
-
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------

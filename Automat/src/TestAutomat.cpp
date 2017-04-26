@@ -1,6 +1,6 @@
-#include "../includes/Automat.h"
+#include "Automat.h"
 #include "iostream"
-#include "../../Shared/includes/String.h"
+#include "String.h"
 
 const char* testString = "nrwejr32[ßewrr=(015_abc hey!2 :*huuuge comment*:\0";
 

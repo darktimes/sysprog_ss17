@@ -3,7 +3,7 @@
  *
  */
 
-#include "../includes/Automat.h"
+#include "Automat.h"
 #include <iostream>
 
 
