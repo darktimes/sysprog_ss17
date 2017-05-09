@@ -8,6 +8,8 @@ HEADERDIR = includes
 SHARED_HEADERDIR = ../Shared/includes
 
 SHARED_SRCDIR = ../Shared/src
+
+SCANNER_SRCDIR = ../Scanner/includes
 # enthaelt die Source Files
 SRCDIR = src
 
@@ -17,9 +19,9 @@ OBJDIR = objs
 # enthaelt die Objectfiles und das ausfuehrbare File zum Testen des Teilprojekts
 BINDIRTEST = debug
 
-CFLAGS=-g -c -Wall -std=c++11
+CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_HEADERDIR) -I$(SCANNER_SRCDIR)
 
-CPPFLAGS=-I$(HEADERDIR) -I$(SHARED_HEADERDIR)
+#CPPFLAGS=-I$(HEADERDIR) -I$(SHARED_HEADERDIR)
 # Linken der Object-files, abhaengig von AutomatTarget und TestAutomatTarget
 # flag:
 # -g --> debug Informationen erzeugen

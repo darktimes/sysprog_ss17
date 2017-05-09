@@ -8,9 +8,9 @@
 #ifndef Automat_SRC_H_
 #define Automat_SRC_H_
 
-#include "../../Scanner/includes/IScanner.h"
-#include "../../Shared/includes/String.h"
-#include "../../Shared/includes/TokenType.h"
+#include "IScanner.h"
+#include "String.h"
+#include "TokenType.h"
 
 class State;
 
