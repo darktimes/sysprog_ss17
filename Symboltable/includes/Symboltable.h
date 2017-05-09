@@ -9,7 +9,13 @@
 #define SYMBOLTABLE_H_
 
 class Symboltable {
+private:
+	static const int tableSize = 100	;
+	StringTab strTab;
+
 public:
+	int hash(char* key);
+
 	Symboltable();
 	virtual ~Symboltable();
 
