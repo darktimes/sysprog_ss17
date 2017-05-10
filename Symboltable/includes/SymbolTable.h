@@ -1,6 +1,4 @@
-#ifndef SYMTABLE_H_
-#define SYMTABLE_H_
-
+#pragma once
 
 class Symbol final {
 public:

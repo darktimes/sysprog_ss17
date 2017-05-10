@@ -1,5 +1,5 @@
-#include <string.h>
-#include "Symtable.h"
+#include "String.h"
+#include "SymbolTable.h"
 
 Symtable::Symtable() :
 		tableSize(64), existingElements(0), data(new Symbol*[tableSize]) {
