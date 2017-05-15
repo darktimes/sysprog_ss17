@@ -22,9 +22,7 @@ private:
 	unsigned tableSize;
 	unsigned existingElements;
 	Symbol** data;
-	/*
-	 *  a freaking comment
-	 * */
+
 	unsigned long strhash(const String str, const unsigned offset = 0);
 	unsigned indexOf(const String str);
 	bool isFull();
