@@ -48,7 +48,7 @@ String::~String() {
 	delete[] str; // Free memory all elements (in this case of type char) directly following the pointer address
 }
 // Access array via '[]' operator
-char& String::operator[](int index) {
+char& String::operator[](int index) const {
 	if ((index <= size) && (index >= 0)) {
 		return str[index];
 	}
@@ -67,7 +67,7 @@ bool String::compare(char &c){
 }
 
 //compare with a string
-bool String::compare(String &s){
+bool String::compare(const String &s) const{
 	if (this->size != s.size){
 		return false;
 	} else {
@@ -125,6 +125,9 @@ String::operator const char*() {
 	return this->str;
 }
 
-int String::getSize() {
+int String::getSize() const{
 	return size;
+}
+char* String::getStr(){
+	return str;
 }

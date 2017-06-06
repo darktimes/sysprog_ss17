@@ -2,13 +2,13 @@
 #include "SymbolTable.h"
 #include <stdlib.h>
 
-Symtable::Symtable() :
+SymbolTable::SymbolTable() :
 		tableSize(64), existingElements(0), data(new Symbol*[tableSize]) {
 	//memset(data, 0, sizeof(Symbol*) * tableSize);
 	data = (Symbol**) malloc(sizeof(Symbol*) * tableSize);
 }
 
-Symtable::~Symtable() {
+SymbolTable::~SymbolTable() {
 	for (unsigned i = 0; i < tableSize; ++i) {
 		Symbol* sym = data[i];
 		if (sym != nullptr)
@@ -17,7 +17,7 @@ Symtable::~Symtable() {
 	delete[] data;
 }
 
-Symbol* Symtable::create(String str) {
+Symbol* SymbolTable::create(String str) {
 	if (isFull())
 		resize();
 
@@ -32,7 +32,7 @@ Symbol* Symtable::create(String str) {
 		return data[i];
 }
 
-unsigned Symtable::indexOf(const String str) { //methode code aendern so dass es passt
+unsigned SymbolTable::indexOf(const String str) { //methode code aendern so dass es passt
 	// const char oder unsere string classe
 	unsigned long h = strhash(str);
 	unsigned i = 0;
@@ -41,20 +41,23 @@ unsigned Symtable::indexOf(const String str) { //methode code aendern so dass es
 	return h;
 }
 
-unsigned long Symtable::strhash(const String str, const unsigned offset) {
+unsigned long SymbolTable::strhash(const String str, const unsigned offset) {
 	// djb2 algorithm k = 33
 	unsigned long hash = 5381;
-	int c;
-	while ((c = str++))
-		hash = hash * 33 + c + offset;
+	//int c;
+	for (int i = 0;  i < str.getSize(); i++) {
+		hash = hash * 33 + (int)str[i] + offset;
+	}
+	//while ((c = str++))
+		//hash = hash * 33 + c + offset;
 	return hash % tableSize;
 }
 
-bool Symtable::isFull() {	//falls >75% voll -> true
+bool SymbolTable::isFull() {	//falls >75% voll -> true
 	return existingElements >= tableSize * 0.75;
 }
 
-void Symtable::resize() {// neue Table doppelt so gross machen, alte copieren und loeschen
+void SymbolTable::resize() {// neue Table doppelt so gross machen, alte copieren und loeschen
 	Symbol** oldData = data;
 	unsigned oldSize = tableSize;
 	tableSize *= 2;
@@ -70,7 +73,7 @@ void Symtable::resize() {// neue Table doppelt so gross machen, alte copieren un
 	delete[] oldData;
 }
 
-void Symtable::resizeCreate(Symbol *sym) {
+void SymbolTable::resizeCreate(Symbol *sym) {
 	unsigned i = indexOf(sym->ident2);
 	data[i] = sym;
 }
@@ -81,10 +84,10 @@ void Symtable::resizeCreate(Symbol *sym) {
 //	strcpy((char*) this->ident, ident);
 //}
 
-Symbol::Symbol(String indent2) {
-	this->ident2 = ident2;
+Symbol::Symbol(String str) {
+	this->ident2 = String(str);
 }
 
 Symbol::~Symbol() {
-	delete[] ident2;
+//	delete[] ident2;
 }

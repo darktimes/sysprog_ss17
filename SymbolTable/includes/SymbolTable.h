@@ -11,10 +11,10 @@ public:
 private:
 };
 
-class Symtable final {
+class SymbolTable final {
 public:
-	Symtable();
-	~Symtable();
+	SymbolTable();
+	~SymbolTable();
 	//Create if non-existant or return already existing
 	Symbol* create(String str);
 

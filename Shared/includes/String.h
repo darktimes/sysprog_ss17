@@ -22,9 +22,9 @@ public:
 	String(const String&);
 	~String();
 
-	char& operator[](int index);
+	char& operator[](int index) const;
 	bool compare(char &c);
-	bool compare(String &s);
+	bool compare(const String &s) const;
 	String& operator=(const String&);
 	String& operator+=(const String&);
 	String& operator+=(const char&);
@@ -32,8 +32,8 @@ public:
 	friend const String operator+(const String&, const char&);
 	operator const char*();
 
-	int getSize();
-
+	int getSize() const;
+	char* getStr();
 
 };
 
