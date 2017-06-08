@@ -5,8 +5,7 @@
  *      Author: Sergey
  */
 
-#ifndef STATES_SRC_H_
-#define STATES_SRC_H_
+#pragma once
 
 #include "IState.h"
 
@@ -141,5 +140,3 @@ public:
 	void createToken(Automat* automat);
 };
 
-
-#endif /* States_H_ */

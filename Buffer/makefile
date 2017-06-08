@@ -12,6 +12,9 @@ OBJDIR = objs
 # enthaelt die Objectfiles und das ausfuehrbare File zum Testen des Teilprojekts
 BINDIRTEST = debug
 
+
+CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) 
+
 #
 #		Targets zum Bauen des Tests
 #
@@ -21,8 +24,8 @@ BINDIRTEST = debug
 # -g --> debug Informationen erzeugen
 # -o --> name des output-files
 
-makeTestBuffer: BufferTarget 	TestBufferTarget
-	g++ -g $(OBJDIR)/Buffer.o 	$(BINDIRTEST)/TestBuffer.o  -o $(BINDIRTEST)/BufferTest
+makeTestBuffer: BufferTarget TestBufferTarget FileReaderTarget
+	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o -o $(BINDIRTEST)/BufferTest
 	
 
 # compilieren der Source-files
@@ -32,27 +35,25 @@ makeTestBuffer: BufferTarget 	TestBufferTarget
 # -g --> debug Informationen erzeugen
 # -Wall --> alle meldungen erzeugen (Warning all)
 
-BufferTarget :  $(SRCDIR)/Buffer.cpp $(HEADERDIR)/Buffer.h 
-	g++ -g  -c -Wall  $(SRCDIR)/Buffer.cpp -o $(OBJDIR)/Buffer.o
+BufferTarget:  $(SRCDIR)/Buffer.cpp 
+	g++ $(CFLAGS) $(SRCDIR)/Buffer.cpp -o $(OBJDIR)/Buffer.o
 
 #TestBuffer.o ist abhaengig von TestBuffer.cpp und Buffer.h
-TestBufferTarget :  $(SRCDIR)/TestBuffer.cpp $(HEADERDIR)/Buffer.h
-	g++ -g  -c -Wall $(SRCDIR)/TestBuffer.cpp -o $(BINDIRTEST)/TestBuffer.o
+TestBufferTarget:  $(SRCDIR)/TestBuffer.cpp 
+	g++ $(CFLAGS) $(SRCDIR)/TestBuffer.cpp -o $(BINDIRTEST)/TestBuffer.o
 
-
-
+FileReaderTarget:  $(SRCDIR)/FileReader.cpp 
+	g++ $(CFLAGS) $(SRCDIR)/FileReader.cpp -o $(OBJDIR)/FileReader.o
 
 # loeschen aller files im verzeichnis $(OBJDIR) und $(BINDIRTEST) und neu compilieren
 
 cleanBuffer:
-	rm -f $(OBJDIR)/*.o
-	rm -f $(BINDIRTEST)/*
-	$(MAKE) makeTestBuffer
-	
+	rm -f objs/*.o
+	rm -f debug/*
 
 # dieses Target wird vom makefile des Gesamtprojekts verwendet
 # objs fuer GesamtProjekt loeschen und dann neu erzeugen
 BufferOBJTarget:
-	$(MAKE) BufferTarget
+	$(MAKE) BufferTarget FileReaderTarget
 
 	

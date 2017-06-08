@@ -12,65 +12,120 @@ OBJDIR = objs
 # enthaelt das ausfuehrbare File zum Testen
 BINDIRTEST = debug
 
-AUTOMATDIR = ../Automat
+AUTOMATHEADER = ../Automat/includes
 
-BUFFERDIR = ../Buffer
+BUFFER_HEADER_DIR = ../Buffer/includes
 
-SYMBOLTABLEDIR = ../Symboltable
+# enthaelt die Header Files
+HEADERDIR = includes
 
-SHAREDDIR = ../Shared
+# enthaelt die Source Files
+SRCDIR = src
+
+SHARED_HEADERDIR = ../Shared/includes
+
+SYMTABLE_HEADERDIR = ../SymbolTable/includes
+
+SHARED_SRCDIR = ../Shared/src
+
+# enthaelt die Obj Files fuer das Gesamtprojekt
+OBJDIR = objs
+
+# enthaelt die Objectfiles und das ausfuehrbare File zum Testen des Teilprojekts
+
+CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_HEADERDIR) -I$(AUTOMATHEADER) -I$(SYMTABLE_HEADERDIR) -I$(BUFFER_HEADER_DIR)
+
+CPPFLAGS=-I$(HEADERDIR) 
+
+makeTestScanner: ScannerTarget ErrorTokenTarget IntegerTokenTarget SymbolTokenTarget ScannerStringTarget TestScannerTarget
+	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o -o $(BINDIRTEST)/ScannerTest
 
 
-## hier alle Object Files eintragen, ausser das File mit der Mainmethode
-## darauf achten, dass letzte Zeile ohne "\" eingetragen wird
 
-OBJS = $(OBJDIR)/Scanner.o \
-	#$(OBJDIR)/xx1.o \
-	#$(OBJDIR)/xxn.o
+ScannerTarget :  $(SRCDIR)/Scanner.cpp 
+	g++ $(CFLAGS) $(SRCDIR)/Scanner.cpp -o $(OBJDIR)/Scanner.o
 
+ErrorTokenTarget :  $(SRCDIR)/ErrorToken.cpp
+	g++ $(CFLAGS) $(SRCDIR)/ErrorToken.cpp -o $(OBJDIR)/ErrorToken.o
 
-## Variante mit wenig Makefile-Kenntnissen
-# 
-## linken der Object-files 
-#makeTestScanner: $(OBJDIR)/Scanner.o $(OBJDIR)/TestScanner.o
-#	g++ -g $(OBJDIR)/Scanner.o $(OBJDIR)/TestScanner.o   $(PROJECTOBJDIR)/Automat/*.o $(PROJECTOBJDIR)/Buffer/*.o $(PROJECTOBJDIR)/Symboltable/*.o -o $(BINDIRTEST)/ScannerTest
-##	
-##	
-##	
-### compilieren der source-files
-#$(OBJDIR)/Scanner.o :  $(SRCDIR)/Scanner.cpp $(HEADERDIR)/Scanner.h
-#	@echo "g++ $*.cpp"
-#	g++ -g  -c -Wall  -o $(OBJDIR)/Scanner.o  $(SRCDIR)/Scanner.cpp
-#	cp $(OBJDIR)/Scanner.o $(PROJECTOBJDIR)/Scanner
-##
-#$(OBJDIR)/TestScanner.o :  $(SRCDIR)/TestScanner.cpp 
-#	@echo "g++ $*.cpp"
-#	g++ -g  -c -Wall  -o $(OBJDIR)/TestScanner.o  $(SRCDIR)/TestScanner.cpp
-#
+IntegerTokenTarget :  $(SRCDIR)/IntegerToken.cpp
+	g++ $(CFLAGS) $(SRCDIR)/IntegerToken.cpp -o $(OBJDIR)/IntegerToken.o
 	
-	
-# Variante mit guten Makefile-Kenntnissen
-makeTestScanner: $(OBJS) ScannerTest
+SymbolTokenTarget :  $(SRCDIR)/SymbolToken.cpp
+	g++ $(CFLAGS) $(SRCDIR)/SymbolToken.cpp -o $(OBJDIR)/SymbolToken.o
 
+ScannerStringTarget: $(SHARED_SRCDIR)/String.cpp
+	g++ $(CFLAGS) $(SHARED_SRCDIR)/String.cpp -o $(BINDIRTEST)/String.o	
 
-$(OBJDIR)/%.o :  $(SRCDIR)/%.cpp $(HEADERDIR)/%.h
-	@echo "g++ $*.cpp"
-	g++ -g  -c -Wall  -o $@  $<
+TestScannerTarget :  $(SRCDIR)/TestScanner.cpp
+	g++ $(CFLAGS) $(SRCDIR)/TestScanner.cpp  -o $(BINDIRTEST)/TestScanner.o
 
-# 
-# $@ name des object files
-# $< erste abhaengigkeit
-
-
-ScannerTest: $(SRCDIR)/TestScanner.cpp $(HEADERDIR)/Scanner.h
-	g++ -g  -c -Wall src/TestScanner.cpp -o $(BINDIRTEST)/TestScanner.o  
-	g++ -g $(BINDIRTEST)/TestScanner.o $(OBJDIR)/*.o $(AUTOMATDIR)/$(OBJDIR)/*.o $(BUFFERDIR)/$(OBJDIR)/*.o $(SHAREDDIR)/$(OBJDIR)/*.o $(SYMBOLTABLEDIR)/$(OBJDIR)/*.o -o $(BINDIRTEST)/ScannerTest
-
-# loeschen aller files im verzeichnis $(OBJDIR) und $(BINDIRTEST) und neu erstellen
 
 cleanScanner:
-	rm -rf $(OBJDIR)/*.o
-	rm -rf $(BINDIRTEST)/*
-#	$(MAKE) makeTestScanner
+	rm -f objs/*.o
+	rm -f debug/*
+	
+# dieses Target wird vom makefile des Gesamtprojekts verwendet
+# objs fuer Gesamtprojekt loeschen und dann neu erzeugen
+ScannerOBJTarget:
+	$(MAKE) ScannerTarget ErrorTokenTarget IntegerTokenTarget SymbolTokenTarget ScannerStringTarget
 
 
+#SYMBOLTABLEDIR = ../Symboltable
+#
+#SHAREDDIR = ../Shared
+#
+#
+### hier alle Object Files eintragen, ausser das File mit der Mainmethode
+### darauf achten, dass letzte Zeile ohne "\" eingetragen wird
+#
+#OBJS = $(OBJDIR)/Scanner.o \
+#	#$(OBJDIR)/xx1.o \
+#	#$(OBJDIR)/xxn.o
+#
+#
+### Variante mit wenig Makefile-Kenntnissen
+## 
+### linken der Object-files 
+##makeTestScanner: $(OBJDIR)/Scanner.o $(OBJDIR)/TestScanner.o
+##	g++ -g $(OBJDIR)/Scanner.o $(OBJDIR)/TestScanner.o   $(PROJECTOBJDIR)/Automat/*.o $(PROJECTOBJDIR)/Buffer/*.o $(PROJECTOBJDIR)/Symboltable/*.o -o $(BINDIRTEST)/ScannerTest
+###	
+###	
+###	
+#### compilieren der source-files
+##$(OBJDIR)/Scanner.o :  $(SRCDIR)/Scanner.cpp $(HEADERDIR)/Scanner.h
+##	@echo "g++ $*.cpp"
+##	g++ -g  -c -Wall  -o $(OBJDIR)/Scanner.o  $(SRCDIR)/Scanner.cpp
+##	cp $(OBJDIR)/Scanner.o $(PROJECTOBJDIR)/Scanner
+###
+##$(OBJDIR)/TestScanner.o :  $(SRCDIR)/TestScanner.cpp 
+##	@echo "g++ $*.cpp"
+##	g++ -g  -c -Wall  -o $(OBJDIR)/TestScanner.o  $(SRCDIR)/TestScanner.cpp
+##
+#	
+#	
+## Variante mit guten Makefile-Kenntnissen
+#makeTestScanner: $(OBJS) ScannerTest
+#
+#
+#$(OBJDIR)/%.o :  $(SRCDIR)/%.cpp $(HEADERDIR)/%.h
+#	@echo "g++ $*.cpp"
+#	g++ -g  -c -Wall  -o $@  $<
+#
+## 
+## $@ name des object files
+## $< erste abhaengigkeit
+#
+#
+#ScannerTest: $(SRCDIR)/TestScanner.cpp $(HEADERDIR)/Scanner.h
+#	g++ -g  -c -Wall src/TestScanner.cpp -o $(BINDIRTEST)/TestScanner.o  
+#	g++ -g $(BINDIRTEST)/TestScanner.o $(OBJDIR)/*.o $(AUTOMATDIR)/$(OBJDIR)/*.o $(BUFFERDIR)/$(OBJDIR)/*.o $(SHAREDDIR)/$(OBJDIR)/*.o $(SYMBOLTABLEDIR)/$(OBJDIR)/*.o -o $(BINDIRTEST)/ScannerTest
+#
+## loeschen aller files im verzeichnis $(OBJDIR) und $(BINDIRTEST) und neu erstellen
+#
+#cleanScanner:
+#	rm -rf $(OBJDIR)/*.o
+#	rm -rf $(BINDIRTEST)/*
+##	$(MAKE) makeTestScanner
+#
+#

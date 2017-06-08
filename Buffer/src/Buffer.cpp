@@ -8,11 +8,49 @@
 #include "../includes/Buffer.h"
 
 
-Buffer::Buffer() {
-	// TODO Auto-generated constructor stub
+Buffer::Buffer(const char* filePath) {
+    this->filePath = filePath;
+    this->fileReader = new FileReader(this->filePath);
+    currentBlockIndex = 0;
+    currentCharIndex = 0;
+    isReadBuffer = false;
+}
 
+Buffer::Buffer(const char* filePath, bool isRead) : Buffer(filePath), isReadBuffer(isRead) {
 }
 
 Buffer::~Buffer() {
 	// TODO Auto-generated destructor stub
 }
+
+
+char Buffer::getChar()
+{
+    if (currentCharIndex >= BufferConstants::BUFFER_BLOCK_SIZE)
+    {
+        currentBlockIndex = (currentBlockIndex + 1)%BufferConstants::BUFFER_BLOCKS_NUMBER;
+        readNextBufferBlock();  
+        currentCharIndex = 0; 
+    } 
+    
+    return (char) bufferArray[currentBlockIndex][currentCharIndex++];
+}
+
+void Buffer::ungetChar(int returnIndex)
+{
+    
+}
+
+void Buffer::readNextBufferBlock()
+{
+    bufferArray[currentBlockIndex] = fileReader->getNextBlock();
+    clearNextBufferBlock();
+}
+void Buffer::clearNextBufferBlock(){
+    int clearBlockIndex = (currentBlockIndex + 1)%BufferConstants::BUFFER_BLOCKS_NUMBER;
+    
+    free(bufferArray[clearBlockIndex]);
+    bufferArray[clearBlockIndex] = 0;
+}
+
+

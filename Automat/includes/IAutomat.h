@@ -5,14 +5,11 @@
  *      Author: Sergey
  */
 
-#ifndef IAUTOMAT_SRC_H_
-#define IAUTOMAT_SRC_H_
+#pragma once
 
-class IAutomat{
+class IAutomat {
 
 public:
 	virtual void process(const char& c) = 0;
 	virtual ~IAutomat() {}
 };
-
-#endif /* IAutomat_H_ */
