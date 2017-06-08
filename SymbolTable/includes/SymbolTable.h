@@ -2,11 +2,9 @@
 
 class Symbol final {
 public:
-//	Symbol(char const* ident);
 	Symbol(String ident2);
 	~Symbol();
 	String ident2;
-	//char const* ident;
 
 private:
 };
@@ -15,7 +13,7 @@ class SymbolTable final {
 public:
 	SymbolTable();
 	~SymbolTable();
-	//Create if non-existant or return already existing
+	//Create if non-existent or return already existing
 	Symbol* create(String str);
 
 private:
