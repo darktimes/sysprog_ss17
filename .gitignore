@@ -24,6 +24,7 @@
 *.lib
 
 # Executables
+debug/
 *.exe
 *.out
 *.app
