@@ -15,10 +15,15 @@
 
 class Buffer {
 public:
+	Buffer(const char* filePath);
+
+	//esli vidumivaesh huetu, please default constructor dlya ludej, sps @ Serega
 	Buffer(const char* filePath, bool isReadBuffer);
 	virtual ~Buffer();
     char getChar();
     void ungetChar(int returnIndex);
+    int getCurrentLine() const;
+    int getCurrentPos() const;
 private:
     void readNextBufferBlock();
     void clearNextBufferBlock();

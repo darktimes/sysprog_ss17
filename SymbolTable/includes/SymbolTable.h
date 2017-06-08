@@ -1,5 +1,7 @@
 #pragma once
 
+#include "String.h"
+
 class Symbol final {
 public:
 //	Symbol(char const* ident);

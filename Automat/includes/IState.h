@@ -5,12 +5,11 @@
  *      Author: Sergey
  */
 
-#ifndef ISTATE_SRC_H_
-#define ISTATE_SRC_H_
-
-class Automat;
+#pragma once
 
 #include "Automat.h"
+
+class Automat;
 
 class IState {
 
@@ -19,5 +18,3 @@ public:
 	virtual void processChar(const char& c, Automat* automat) = 0;
 
 };
-
-#endif /* IState_H_ */

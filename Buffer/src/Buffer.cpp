@@ -8,12 +8,15 @@
 #include "../includes/Buffer.h"
 
 
-Buffer::Buffer(const char* filePath, bool isRead) {
+Buffer::Buffer(const char* filePath) {
     this->filePath = filePath;
-    this->isReadBuffer = isRead;
     this->fileReader = new FileReader(this->filePath);
     currentBlockIndex = 0;
     currentCharIndex = 0;
+    isReadBuffer = false;
+}
+
+Buffer::Buffer(const char* filePath, bool isRead) : Buffer(filePath), isReadBuffer(isRead) {
 }
 
 Buffer::~Buffer() {
