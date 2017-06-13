@@ -7,47 +7,104 @@
 
 #include "../includes/Buffer.h"
 
-
-Buffer::Buffer(const char* filePath, bool isRead) {
-    this->filePath = filePath;
-    this->isReadBuffer = isRead;
-    this->fileReader = new FileReader(this->filePath);
+Buffer::Buffer(const char* filePath) {
+    isReadBuffer = true;
+    fileReader = new FileReader(filePath);
     currentBlockIndex = 0;
     currentCharIndex = 0;
+    currentPos = 0;
+}
+
+Buffer::Buffer(const char* filePath, bool isRead):Buffer(filePath) {
+    isReadBuffer = isRead;
 }
 
 Buffer::~Buffer() {
-	// TODO Auto-generated destructor stub
+    //TODO
 }
-
 
 char Buffer::getChar()
-{
-    if (currentCharIndex >= BufferConstants::BUFFER_BLOCK_SIZE)
+{       
+    if (!currentBufferBlock) //not valid
     {
-        currentBlockIndex = (currentBlockIndex + 1)%BufferConstants::BUFFER_BLOCKS_NUMBER;
-        readNextBufferBlock();  
-        currentCharIndex = 0; 
+        currentBufferBlock = new BufferBlock(fileReader->getNextFileBlock());
     } 
+    else 
+    {
+        if (currentCharIndex >= (BufferConstants::BUFFER_BLOCK_SIZE / 2))
+        {
+            if (currentCharIndex == BufferConstants::BUFFER_BLOCK_SIZE)
+            {
+                switchToNextBlock();
+            }
+            else 
+            {   
+                if (currentBufferBlock->getPrevious()) 
+                {                  
+                    currentBufferBlock->clearPrevious();
+                }
+                if (!currentBufferBlock->getNext() && !fileReader->isEof())
+                {
+                    currentBufferBlock->setNext(new BufferBlock(fileReader->getNextFileBlock()));
+                }
+            }
+        }
+    }
+    char out = currentBufferBlock->getCharAt(currentCharIndex++);
+    if (out == '\0')
+    {
+        if (fileReader->isEof())
+        {
+            currentPos++;
+            return '\0';
+        }
+        else
+        {
+            switchToNextBlock();
+            currentPos++;
+            return currentBufferBlock->getCharAt(currentCharIndex++);
+        }
+    }
     
-    return (char) bufferArray[currentBlockIndex][currentCharIndex++];
+    currentPos++;
+    return out;
 }
 
-void Buffer::ungetChar(int returnIndex)
+void Buffer::ungetChar(unsigned int ungetCount)
 {
+    if (ungetCount> BufferConstants::BUFFER_MAX_STEPBACK)
+        throw std::runtime_error("Error: stepback is too big");
+        
+    if (!currentBufferBlock) //not valid
+    {
+        throw std::runtime_error("Error: current block not initialized");
+    }
     
+    if (ungetCount <=  currentCharIndex)
+    {
+        currentCharIndex -= ungetCount;
+        currentPos -= ungetCount;
+    }
+    else
+    { //not tested
+        if (currentBufferBlock->getPrevious())
+        {
+            int diff = ungetCount - currentCharIndex;
+            currentBufferBlock = currentBufferBlock->getPrevious();
+            currentBlockIndex--;
+            currentCharIndex = currentBufferBlock->getLength() - diff;
+        }
+        else
+            throw std::runtime_error("Error: previous block does not exist yet");
+    }
+        
+}
+void Buffer::switchToNextBlock(){
+    currentBufferBlock = currentBufferBlock->getNext();
+    currentCharIndex = 0;
+    currentBlockIndex++;
 }
 
-void Buffer::readNextBufferBlock()
-{
-    bufferArray[currentBlockIndex] = fileReader->getNextBlock();
-    clearNextBufferBlock();
+unsigned int Buffer::getCurrentPos(){
+    return currentPos;
 }
-void Buffer::clearNextBufferBlock(){
-    int clearBlockIndex = (currentBlockIndex + 1)%BufferConstants::BUFFER_BLOCKS_NUMBER;
-    
-    free(bufferArray[clearBlockIndex]);
-    bufferArray[clearBlockIndex] = 0;
-}
-
-

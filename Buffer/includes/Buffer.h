@@ -12,23 +12,26 @@
 
 #include "LibConstants.h"
 #include "FileReader.h"
+#include "BufferBlock.h"
 
 class Buffer {
 public:
-	Buffer(const char* filePath, bool isReadBuffer);
+    Buffer(const char*);
+	Buffer(const char*, bool);
 	virtual ~Buffer();
     char getChar();
-    void ungetChar(int returnIndex);
+    void ungetChar(unsigned int);
+    unsigned int getCurrentPos();
 private:
-    void readNextBufferBlock();
-    void clearNextBufferBlock();
     FileReader* fileReader;
-    int currentCharIndex;
-    int currentBlockIndex;
+    BufferBlock* currentBufferBlock;
+    void switchToNextBlock();
+
+    unsigned int currentCharIndex;
+    unsigned int currentBlockIndex;
+
+    unsigned int currentPos;
     bool isReadBuffer;
-    const char* filePath;
-    char* bufferArray[BufferConstants::BUFFER_BLOCKS_NUMBER-1];
-    
 };
 
 #endif /* BUFFER_H_ */

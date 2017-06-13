@@ -1,24 +1,33 @@
 #include "../includes/FileReader.h"
 
-
 FileReader::FileReader(const char* filePath) {
-    this->filePath = filePath;
-    this->readFile->open(filePath);
-    this->currentIndex = 0;
+    readFile = new ifstream(filePath);
+    eof = false;
+    currentCharIndex = 0;
 }
 
 FileReader::~FileReader() {
-    //TODO: close reader
-    this->readFile->close();
+    readFile->close();
 }
-char* FileReader::getNextBlock()
+char* FileReader::getNextFileBlock()
 {
-    delete[] blockContent;
+    if (!readFile->is_open())
+        throw std::runtime_error("File is not opened!");
+        
+    if (eof)
+        throw std::runtime_error("Eof reached, no next file block!");
+        
     blockContent = new char[BufferConstants::BUFFER_BLOCK_SIZE];
-    readFile->seekg (currentIndex);
-    readFile->read (this->blockContent, BufferConstants::BUFFER_BLOCK_SIZE);
+    readFile->seekg (currentCharIndex);
+    readFile->get(this->blockContent, BufferConstants::BUFFER_BLOCK_SIZE, '\0');
+
+    currentCharIndex += strlen(blockContent);
+    eof = readFile->eof();
     
-    currentIndex += BufferConstants::BUFFER_BLOCK_SIZE;
     return blockContent;
+}
+ bool FileReader::isEof()
+{
+   return eof;
 }
 
