@@ -24,6 +24,13 @@
 *.lib
 
 # Executables
+debug/
 *.exe
 *.out
 *.app
+
+# Other Files
+Scanner/src/test.txt
+.cproject
+.project
+.settings/language.settings.xml

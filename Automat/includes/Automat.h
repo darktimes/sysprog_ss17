@@ -5,8 +5,7 @@
  *      Author: knad0001
  */
 
-#ifndef Automat_SRC_H_
-#define Automat_SRC_H_
+#pragma once
 
 #include "IScanner.h"
 #include "String.h"
@@ -36,5 +35,3 @@ public:
 	
 	State* getLastFinalState() const;
 };
-
-#endif /* Automat_H_ */

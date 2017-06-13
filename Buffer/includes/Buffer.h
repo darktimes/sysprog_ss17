@@ -16,12 +16,14 @@
 
 class Buffer {
 public:
+
     Buffer(const char*);
 	Buffer(const char*, bool);
 	virtual ~Buffer();
     char getChar();
     void ungetChar(unsigned int);
     unsigned int getCurrentPos();
+
 private:
     FileReader* fileReader;
     BufferBlock* currentBufferBlock;

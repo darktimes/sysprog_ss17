@@ -5,11 +5,10 @@
  *      Author: David Seifried
  */
 
-#ifndef SCANNER_SRC_ISCANNER_H_
-#define SCANNER_SRC_ISCANNER_H_
+#pragma once
 
-#include "../../Shared/includes/String.h"
-#include "../../Shared/includes/TokenType.h"
+#include "String.h"
+#include "TokenType.h"
 
 /*
  * Interface to be used by 'Automat' (Finite State Machine)
@@ -18,10 +17,8 @@ class IScanner {
 public:
 	virtual ~IScanner() {}
 	virtual void mkToken(TokenType tokenType,String* lexem) = 0; // creates the token of given type and lexem
-	virtual void mkToken(TokenType tokenType, const char& c) = 0; // creates the token of given type and lexem
-	virtual void ungetChar(int number) = 0; // readjust position of scanner
+	virtual void ungetChar(int number) = 0; // read just position of scanner. 0 => child class must implement
 
 };
 
-#endif /* SCANNER_SRC_ISCANNER_H_ */
 

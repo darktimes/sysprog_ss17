@@ -5,8 +5,7 @@
  *      Author: David Seifried
  */
 
-#ifndef SHARED_SRC_TOKENTYPE_H_
-#define SHARED_SRC_TOKENTYPE_H_
+#pragma once
 
 typedef enum e_TokenType {
 	Initialized,		// default value to initialize with
@@ -40,4 +39,3 @@ typedef enum e_TokenType {
 } TokenType;
 
 
-#endif /* SHARED_INCLUDES_TOKENTYPE_H_ */

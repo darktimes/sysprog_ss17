@@ -4,9 +4,7 @@
  *  Created on: 1 Nov 2016
  *      Author: David Seifried
  */
-
-#ifndef SHARED_SRC_STRING_H_
-#define SHARED_SRC_STRING_H_
+#pragma once
 
 /*
  *
@@ -36,5 +34,3 @@ public:
 	char* getStr();
 
 };
-
-#endif

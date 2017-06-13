@@ -7,12 +7,14 @@
 
 #include "../includes/Buffer.h"
 
+
 Buffer::Buffer(const char* filePath) {
     isReadBuffer = true;
     fileReader = new FileReader(filePath);
     currentBlockIndex = 0;
     currentCharIndex = 0;
     currentPos = 0;
+
 }
 
 Buffer::Buffer(const char* filePath, bool isRead):Buffer(filePath) {
