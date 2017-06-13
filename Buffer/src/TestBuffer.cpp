@@ -1,6 +1,8 @@
-#include "../includes/Buffer.h"
+
 
 #include <iostream>
+
+#include "Buffer.h"
 
 using namespace std;
 

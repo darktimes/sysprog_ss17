@@ -24,7 +24,7 @@ CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR)
 # -g --> debug Informationen erzeugen
 # -o --> name des output-files
 
-makeTestBuffer: BufferTarget TestBufferTarget FileReaderTarget
+makeTestBuffer: BufferTarget BufferBlockTarget TestBufferTarget FileReaderTarget
 	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o -o $(BINDIRTEST)/BufferTest
 	
 
@@ -37,6 +37,10 @@ makeTestBuffer: BufferTarget TestBufferTarget FileReaderTarget
 
 BufferTarget:  $(SRCDIR)/Buffer.cpp 
 	g++ $(CFLAGS) $(SRCDIR)/Buffer.cpp -o $(OBJDIR)/Buffer.o
+	
+BufferBlockTarget:  $(SRCDIR)/BufferBlock.cpp 
+	g++ $(CFLAGS) $(SRCDIR)/BufferBlock.cpp -o $(OBJDIR)/BufferBlock.o
+	
 
 #TestBuffer.o ist abhaengig von TestBuffer.cpp und Buffer.h
 TestBufferTarget:  $(SRCDIR)/TestBuffer.cpp 

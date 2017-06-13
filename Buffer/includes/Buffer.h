@@ -5,14 +5,15 @@
  *      Author: knad0001
  */
 
-#ifndef BUFFER_H_
-#define BUFFER_H_
+#pragma once
 
 #include <stdlib.h>
 
-#include "LibConstants.h"
 #include "FileReader.h"
 #include "BufferBlock.h"
+
+class FileReader;
+class BufferBlock;
 
 class Buffer {
 public:
@@ -23,6 +24,10 @@ public:
     char getChar();
     void ungetChar(unsigned int);
     unsigned int getCurrentPos();
+
+    static const unsigned int  BUFFER_BLOCK_SIZE;
+	static const unsigned int  BUFFER_MAX_STEPBACK;
+
 
 private:
     FileReader* fileReader;
@@ -35,5 +40,3 @@ private:
     unsigned int currentPos;
     bool isReadBuffer;
 };
-
-#endif /* BUFFER_H_ */

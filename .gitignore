@@ -34,3 +34,6 @@ Scanner/src/test.txt
 .cproject
 .project
 .settings/language.settings.xml
+Automat/debug/*
+Scanner/debug/*
+Buffer/debug/*

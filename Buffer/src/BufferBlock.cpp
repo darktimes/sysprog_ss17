@@ -1,9 +1,11 @@
-#include "../includes/BufferBlock.h"
+#include "BufferBlock.h"
 
 BufferBlock::BufferBlock(char* content) 
 {
     this->content = content;
     this->length = strlen(content);
+    previous = nullptr;
+    next = nullptr;
 }
 
 BufferBlock::~BufferBlock() 

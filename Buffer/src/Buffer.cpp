@@ -5,7 +5,10 @@
  *      Author: knad0001
  */
 
-#include "../includes/Buffer.h"
+#include "Buffer.h"
+
+const unsigned int Buffer::BUFFER_BLOCK_SIZE = 6;
+const unsigned int Buffer::BUFFER_MAX_STEPBACK = Buffer::BUFFER_BLOCK_SIZE / 2;
 
 
 Buffer::Buffer(const char* filePath) {
@@ -14,8 +17,9 @@ Buffer::Buffer(const char* filePath) {
     currentBlockIndex = 0;
     currentCharIndex = 0;
     currentPos = 0;
-
+    currentBufferBlock = nullptr;
 }
+
 
 Buffer::Buffer(const char* filePath, bool isRead):Buffer(filePath) {
     isReadBuffer = isRead;
@@ -33,9 +37,9 @@ char Buffer::getChar()
     } 
     else 
     {
-        if (currentCharIndex >= (BufferConstants::BUFFER_BLOCK_SIZE / 2))
+        if (currentCharIndex >= (Buffer::BUFFER_BLOCK_SIZE / 2))
         {
-            if (currentCharIndex == BufferConstants::BUFFER_BLOCK_SIZE)
+            if (currentCharIndex == Buffer::BUFFER_BLOCK_SIZE)
             {
                 switchToNextBlock();
             }
@@ -74,7 +78,7 @@ char Buffer::getChar()
 
 void Buffer::ungetChar(unsigned int ungetCount)
 {
-    if (ungetCount> BufferConstants::BUFFER_MAX_STEPBACK)
+    if (ungetCount> Buffer::BUFFER_MAX_STEPBACK)
         throw std::runtime_error("Error: stepback is too big");
         
     if (!currentBufferBlock) //not valid

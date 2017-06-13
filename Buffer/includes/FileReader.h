@@ -1,11 +1,10 @@
-#ifndef FILE_READER_H_
-#define FILE_READER_H_
+#pragma once
 
-#include "LibConstants.h"
 #include <string.h>
 #include <iostream>
 #include <fstream>
-using namespace std;
+
+#include "Buffer.h"
 
 class FileReader{
 public:
@@ -14,9 +13,8 @@ public:
     char* getNextFileBlock();
     bool isEof();
 private:
-    ifstream* readFile;
+    std::ifstream* readFile;
     char* blockContent;
     int currentCharIndex;
     bool eof;
 };
-#endif

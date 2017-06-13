@@ -1,9 +1,10 @@
-#include "../includes/FileReader.h"
+#include "FileReader.h"
 
 FileReader::FileReader(const char* filePath) {
-    readFile = new ifstream(filePath);
+    readFile = new std::ifstream(filePath);
     eof = false;
     currentCharIndex = 0;
+    blockContent = nullptr;
 }
 
 FileReader::~FileReader() {
@@ -17,9 +18,9 @@ char* FileReader::getNextFileBlock()
     if (eof)
         throw std::runtime_error("Eof reached, no next file block!");
         
-    blockContent = new char[BufferConstants::BUFFER_BLOCK_SIZE];
+    blockContent = new char[Buffer::BUFFER_BLOCK_SIZE];
     readFile->seekg (currentCharIndex);
-    readFile->get(this->blockContent, BufferConstants::BUFFER_BLOCK_SIZE, '\0');
+    readFile->get(this->blockContent, Buffer::BUFFER_BLOCK_SIZE, '\0');
 
     currentCharIndex += strlen(blockContent);
     eof = readFile->eof();

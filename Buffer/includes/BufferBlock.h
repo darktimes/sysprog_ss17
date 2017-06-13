@@ -1,6 +1,7 @@
 #pragma once
-#include "LibConstants.h"
+
 #include <string.h>
+#include "Buffer.h"
 
 class BufferBlock {
 public:
