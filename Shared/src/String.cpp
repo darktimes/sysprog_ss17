@@ -22,15 +22,15 @@ String::String(char c) {
 // Constructor for 1 parameter of type const char* (pointing to a string constant)
 String::String(const char* s) {
 	// Get size of string
-	size = 0;
+	size = 1;
 	int i;
 	for (i = 0; s[i] != '\0'; i++) {
 		size++;
 	}
+
 	// Copy string which was passed via parameter to new char array (private pointer)
-	str = new char[size + 1];
-	int j;
-	for (j = 0; j < size + 1; j++) {
+	str = new char[size];
+	for (int j = 0; j < size; j++) {
 		str[j] = s[j];
 	}
 }

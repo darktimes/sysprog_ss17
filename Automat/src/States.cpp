@@ -22,7 +22,9 @@ bool State::isAcceptable() {
 void State::fallback(const int& count, Automat* automat) {
 	automat->getScanner()->ungetChar(count);
 	if (count == 1) {
+
 		createToken(automat);
+
 	} else {
 		automat->getLastFinalState()->createToken(automat);
 	}
@@ -87,7 +89,8 @@ void StateInit::processChar(const char& c, Automat* automat) {
 	} else if (c == ' ' || c == '\n' || c == '\t')  {
 		automat->changeState(new StateSeparator(c));
 	} else if (c == '\0') {
-		automat->getScanner()->mkToken(TokenEOF, '\0');
+		//automat->getScanner()->mkToken(TokenEOF, '\0');
+		createToken(automat);
 		automat->changeState(new StateFinished());
 	} else {
 		//adding single character on the empty string works wrong
@@ -98,7 +101,7 @@ void StateInit::processChar(const char& c, Automat* automat) {
 }
 
 void StateInit::createToken(Automat* automat) {
-	automat->getScanner()->mkToken(TokenUnknown, _lexem);
+	automat->getScanner()->mkToken(TokenEOF, _lexem);
 }
 //------------------------------------------------------------------------------------------------------------------------------------
 // StateFinished
@@ -165,19 +168,19 @@ void StateAutoFallback::processChar(const char&, Automat* automat) {
 void StateSigns::createToken(Automat* automat) {
 	char c = *(_lexem)[0];
 	switch (c) {
-		case '+' : automat->getScanner()->mkToken(TokenPlus, c); break;
-		case '-' : automat->getScanner()->mkToken(TokenMinus, c); break;
-		case '*' : automat->getScanner()->mkToken(TokenAsterisk, c); break;
-		case '!' : automat->getScanner()->mkToken(TokenExclamation, c); break;
-		case '(' : automat->getScanner()->mkToken(TokenBracketOpen1, c); break;
-		case ')' : automat->getScanner()->mkToken(TokenBracketClose1, c); break;
-		case '{' : automat->getScanner()->mkToken(TokenBracketOpen2, c); break;
-		case '}' : automat->getScanner()->mkToken(TokenBracketClose2, c); break;
-		case '[' : automat->getScanner()->mkToken(TokenBracketOpen3, c); break;
-		case ']' : automat->getScanner()->mkToken(TokenBracketClose3, c); break;
-		case ';' : automat->getScanner()->mkToken(TokenSemicolon, c); break;
-		case '>' : automat->getScanner()->mkToken(TokenGreaterThan, c); break;
-		case '<' : automat->getScanner()->mkToken(TokenLessThan, c); break;
+		case '+' : automat->getScanner()->mkToken(TokenPlus, _lexem); break;
+		case '-' : automat->getScanner()->mkToken(TokenMinus, _lexem); break;
+		case '*' : automat->getScanner()->mkToken(TokenAsterisk, _lexem); break;
+		case '!' : automat->getScanner()->mkToken(TokenExclamation, _lexem); break;
+		case '(' : automat->getScanner()->mkToken(TokenBracketOpen1, _lexem); break;
+		case ')' : automat->getScanner()->mkToken(TokenBracketClose1, _lexem); break;
+		case '{' : automat->getScanner()->mkToken(TokenBracketOpen2, _lexem); break;
+		case '}' : automat->getScanner()->mkToken(TokenBracketClose2, _lexem); break;
+		case '[' : automat->getScanner()->mkToken(TokenBracketOpen3, _lexem); break;
+		case ']' : automat->getScanner()->mkToken(TokenBracketClose3, _lexem); break;
+		case ';' : automat->getScanner()->mkToken(TokenSemicolon, _lexem); break;
+		case '>' : automat->getScanner()->mkToken(TokenGreaterThan, _lexem); break;
+		case '<' : automat->getScanner()->mkToken(TokenLessThan, _lexem); break;
 	}
 }
 

@@ -34,6 +34,7 @@ void Automat::changeState(State* state) {
 		lastFinalState = currentState;
 		currentState = state;
 	} else {
+
 		delete currentState;
 		currentState = state;
 	}

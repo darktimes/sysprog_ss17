@@ -7,7 +7,7 @@ AUTOMATDIR = Automat
 
 BUFFERDIR = Buffer
 
-SYMBOLTABLEDIR = Symboltable
+SYMBOLTABLEDIR = SymbolTable
 
 SHAREDDIR = Shared
 
@@ -39,7 +39,7 @@ bufferOBJs:
 
 	
 symboltableOBJs:
-	$(MAKE) -C $(SYMBOLTABLEDIR) SymboltableOBJTarget
+	$(MAKE) -C $(SYMBOLTABLEDIR) SymbolTableOBJTarget
 
 
 sharedOBJs:
