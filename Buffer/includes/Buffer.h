@@ -19,24 +19,25 @@ class Buffer {
 public:
 
     Buffer(const char*);
-	Buffer(const char*, bool);
 	virtual ~Buffer();
     char getChar();
     void ungetChar(unsigned int);
+
+    unsigned int getCurrentLine();
     unsigned int getCurrentPos();
 
-    static const unsigned int  BUFFER_BLOCK_SIZE;
-	static const unsigned int  BUFFER_MAX_STEPBACK;
+    static const unsigned int BLOCK_SIZE;
+	static const unsigned int MAX_STEPBACK;
 
+	bool isEOF();
 
 private:
+	bool eofConsumed;
     FileReader* fileReader;
     BufferBlock* currentBufferBlock;
     void switchToNextBlock();
-
+    void adjustIndiciesIn(int steps);
     unsigned int currentCharIndex;
     unsigned int currentBlockIndex;
-
-    unsigned int currentPos;
-    bool isReadBuffer;
+    unsigned int stepBackAmount;
 };

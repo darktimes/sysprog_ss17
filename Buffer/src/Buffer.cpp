@@ -7,110 +7,138 @@
 
 #include "Buffer.h"
 
-const unsigned int Buffer::BUFFER_BLOCK_SIZE = 6;
-const unsigned int Buffer::BUFFER_MAX_STEPBACK = Buffer::BUFFER_BLOCK_SIZE / 2;
+const unsigned int Buffer::BLOCK_SIZE = 16;
+const unsigned int Buffer::MAX_STEPBACK = Buffer::BLOCK_SIZE / 2;
 
 
 Buffer::Buffer(const char* filePath) {
-    isReadBuffer = true;
     fileReader = new FileReader(filePath);
     currentBlockIndex = 0;
     currentCharIndex = 0;
-    currentPos = 0;
+    stepBackAmount = 0;
     currentBufferBlock = nullptr;
-}
-
-
-Buffer::Buffer(const char* filePath, bool isRead):Buffer(filePath) {
-    isReadBuffer = isRead;
+    eofConsumed = false;
 }
 
 Buffer::~Buffer() {
-    //TODO
+	if (currentBufferBlock) {
+		delete currentBufferBlock;
+	}
+	delete fileReader;
 }
 
 char Buffer::getChar()
 {       
-    if (!currentBufferBlock) //not valid
-    {
-        currentBufferBlock = new BufferBlock(fileReader->getNextFileBlock());
-    } 
-    else 
-    {
-        if (currentCharIndex >= (Buffer::BUFFER_BLOCK_SIZE / 2))
-        {
-            if (currentCharIndex == Buffer::BUFFER_BLOCK_SIZE)
-            {
-                switchToNextBlock();
-            }
-            else 
-            {   
-                if (currentBufferBlock->getPrevious()) 
-                {                  
-                    currentBufferBlock->clearPrevious();
-                }
-                if (!currentBufferBlock->getNext() && !fileReader->isEof())
-                {
-                    currentBufferBlock->setNext(new BufferBlock(fileReader->getNextFileBlock()));
-                }
-            }
+	if (eofConsumed) {
+		return '\0';
+	}
+
+    if (!currentBufferBlock) {
+        currentBufferBlock = fileReader->getBufferBlockAt(currentBlockIndex);
+        if (!currentBufferBlock) {
+        	eofConsumed = true;
+        	return '\0';
         }
     }
-    char out = currentBufferBlock->getCharAt(currentCharIndex++);
-    if (out == '\0')
-    {
-        if (fileReader->isEof())
-        {
-            currentPos++;
-            return '\0';
-        }
-        else
-        {
-            switchToNextBlock();
-            currentPos++;
-            return currentBufferBlock->getCharAt(currentCharIndex++);
-        }
-    }
-    
-    currentPos++;
-    return out;
+
+	if (currentCharIndex == MAX_STEPBACK) {
+		if (currentBufferBlock->getPrevious()) {
+			currentBufferBlock->clearPrevious();
+		}
+	}
+
+	if (currentCharIndex == BLOCK_SIZE - MAX_STEPBACK) {
+		if (!currentBufferBlock->isLastBlock()) {
+			currentBufferBlock->setNext(fileReader->getBufferBlockAt(currentBlockIndex + 1));
+		}
+	} else if (currentCharIndex == BLOCK_SIZE) {
+		currentCharIndex = 0;
+		currentBlockIndex++;
+		if (currentBufferBlock->getNext()) {
+			currentBufferBlock = currentBufferBlock->getNext();
+		}
+
+	}
+
+	if (stepBackAmount < MAX_STEPBACK) {
+		stepBackAmount++;
+	}
+	char c = currentBufferBlock->getCharAt(currentCharIndex++);
+	if (c == '\0') {
+		eofConsumed = true;
+	}
+	return c;
 }
 
 void Buffer::ungetChar(unsigned int ungetCount)
 {
-    if (ungetCount> Buffer::BUFFER_MAX_STEPBACK)
-        throw std::runtime_error("Error: stepback is too big");
-        
-    if (!currentBufferBlock) //not valid
-    {
-        throw std::runtime_error("Error: current block not initialized");
+    if (ungetCount > Buffer::MAX_STEPBACK || ungetCount > stepBackAmount) {
+        throw std::invalid_argument("Step back exceeds allowed offset");
     }
+    if (!currentBufferBlock) {
+        throw std::runtime_error("Buffer doesn't have any content to step back.");
+    }
+    if (eofConsumed) {
+    	eofConsumed = false;
+    }
+    stepBackAmount -= ungetCount;
     
-    if (ungetCount <=  currentCharIndex)
-    {
+    if (ungetCount <=  currentCharIndex) {
         currentCharIndex -= ungetCount;
-        currentPos -= ungetCount;
-    }
-    else
-    { //not tested
-        if (currentBufferBlock->getPrevious())
-        {
-            int diff = ungetCount - currentCharIndex;
-            currentBufferBlock = currentBufferBlock->getPrevious();
-            currentBlockIndex--;
-            currentCharIndex = currentBufferBlock->getLength() - diff;
-        }
-        else
-            throw std::runtime_error("Error: previous block does not exist yet");
+    } else {
+//        if (currentBufferBlock->getPrevious()) {
+//
+//        }
+//        else {
+//            throw std::runtime_error("Trying to access non-existent content.");
+//        }
+    	unsigned int diff = ungetCount - currentCharIndex;
+		currentBufferBlock = currentBufferBlock->getPrevious();
+		currentBlockIndex--;
+		currentCharIndex = Buffer::BLOCK_SIZE - diff;
     }
         
-}
-void Buffer::switchToNextBlock(){
-    currentBufferBlock = currentBufferBlock->getNext();
-    currentCharIndex = 0;
-    currentBlockIndex++;
 }
 
-unsigned int Buffer::getCurrentPos(){
-    return currentPos;
+unsigned int Buffer::getCurrentLine() {
+	return currentBlockIndex;
+}
+
+unsigned int Buffer::getCurrentPos() {
+	return currentCharIndex;
+}
+
+void Buffer::adjustIndiciesIn(int steps) {
+	if (steps == 1) {
+		if (currentCharIndex == Buffer::BLOCK_SIZE - 1) {
+			currentCharIndex = 0;
+			currentBlockIndex++;
+		} else {
+			currentCharIndex++;
+		}
+	} else if (steps < 0) {
+		unsigned int steps_abs = (unsigned int)steps;
+		if (steps_abs <= Buffer::MAX_STEPBACK) {
+			if (currentCharIndex > steps_abs) {
+				currentCharIndex-= steps_abs;
+			} else {
+
+				if (currentBlockIndex != 0) {
+					currentCharIndex = Buffer::BLOCK_SIZE - (steps_abs - currentCharIndex);
+					currentBlockIndex--;
+				} else {
+					currentCharIndex = 0;
+				}
+
+			}
+		} else {
+			throw std::invalid_argument("Offset can be either 1 or in range MAX_STEPBACK...0");
+		}
+	} else {
+		throw std::invalid_argument("Offset can be either 1 or in range MAX_STEPBACK...0");
+	}
+}
+
+bool Buffer::isEOF() {
+	return eofConsumed;
 }

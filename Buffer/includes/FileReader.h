@@ -5,16 +5,16 @@
 #include <fstream>
 
 #include "Buffer.h"
+#include "BufferBlock.h"
+
+class BufferBlock;
 
 class FileReader{
 public:
     FileReader(const char* filePath);
     ~FileReader();
-    char* getNextFileBlock();
-    bool isEof();
+    BufferBlock* getBufferBlockAt(unsigned int blockIndex);
+
 private:
     std::ifstream* readFile;
-    char* blockContent;
-    int currentCharIndex;
-    bool eof;
 };

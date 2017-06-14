@@ -1,9 +1,9 @@
 #include "BufferBlock.h"
 
-BufferBlock::BufferBlock(char* content) 
+BufferBlock::BufferBlock(char* content,unsigned int length)
 {
     this->content = content;
-    this->length = strlen(content);
+    this->length = length;
     previous = nullptr;
     next = nullptr;
 }
@@ -15,10 +15,13 @@ BufferBlock::~BufferBlock()
 
 char BufferBlock::getCharAt(unsigned int index) const
 {
-    if (length <= index)
-        return '\0';
-    else
-        return content[index];
+	if (index < length) {
+		return content[index];
+	} else if(isLastBlock()) {
+		return '\0';
+	} else {
+		throw std::range_error("Index exceeds length.");
+	}
 }
 unsigned int BufferBlock::getLength() const
 {
@@ -27,8 +30,7 @@ unsigned int BufferBlock::getLength() const
 void BufferBlock::setNext(BufferBlock* bufferBlock)
 {
     this->next = bufferBlock;
-    this->previous = bufferBlock->previous;
- //   bufferBlock->previous = this;
+    bufferBlock->previous = this;
 }
 void BufferBlock::clearPrevious()
 {
@@ -44,7 +46,9 @@ BufferBlock* BufferBlock::getPrevious()
     return previous;
 }
 
-
+bool BufferBlock::isLastBlock() const{
+	return length != Buffer::BLOCK_SIZE;
+}
 
 
 

@@ -1,11 +1,10 @@
 #pragma once
 
-#include <string.h>
 #include "Buffer.h"
 
 class BufferBlock {
 public:
-	BufferBlock(char*);
+	BufferBlock(char*, unsigned int);
 	virtual ~BufferBlock();
     char getCharAt(unsigned int) const;
     unsigned int getLength() const;
@@ -13,6 +12,7 @@ public:
     void clearPrevious();
     BufferBlock* getNext();
     BufferBlock* getPrevious();
+    bool isLastBlock() const;
 
 private:
     char* content;
