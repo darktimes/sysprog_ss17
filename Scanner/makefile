@@ -26,7 +26,7 @@ SHARED_HEADERDIR = ../Shared/includes
 
 SYMTABLE_HEADERDIR = ../SymbolTable/includes
 
-SHARED_SRCDIR = ../Shared/src
+#SHARED_SRCDIR = ../Shared/src
 
 # enthaelt die Obj Files fuer das Gesamtprojekt
 OBJDIR = objs
@@ -37,25 +37,38 @@ CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_HEADERDIR) -I$(AUTOMATHE
 
 CPPFLAGS=-I$(HEADERDIR) 
 
-makeTestScanner: ScannerTarget ErrorTokenTarget IntegerTokenTarget SymbolTokenTarget ScannerStringTarget TestScannerTarget
-	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o -o $(BINDIRTEST)/ScannerTest
+makeTestScanner: ScannerTarget BaseTokenTarget TestScannerTarget
+#	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o -o $(BINDIRTEST)/ScannerTest
 
 
 
 ScannerTarget :  $(SRCDIR)/Scanner.cpp 
 	g++ $(CFLAGS) $(SRCDIR)/Scanner.cpp -o $(OBJDIR)/Scanner.o
 
-ErrorTokenTarget :  $(SRCDIR)/ErrorToken.cpp
-	g++ $(CFLAGS) $(SRCDIR)/ErrorToken.cpp -o $(OBJDIR)/ErrorToken.o
+BaseTokenTarget : $(SRCDIR)/BaseToken.cpp
+	g++ $(CFLAGS) $(SRCDIR)/BaseToken.cpp -o $(OBJDIR)/BaseToken.o
 
-IntegerTokenTarget :  $(SRCDIR)/IntegerToken.cpp
-	g++ $(CFLAGS) $(SRCDIR)/IntegerToken.cpp -o $(OBJDIR)/IntegerToken.o
-	
-SymbolTokenTarget :  $(SRCDIR)/SymbolToken.cpp
-	g++ $(CFLAGS) $(SRCDIR)/SymbolToken.cpp -o $(OBJDIR)/SymbolToken.o
 
-ScannerStringTarget: $(SHARED_SRCDIR)/String.cpp
-	g++ $(CFLAGS) $(SHARED_SRCDIR)/String.cpp -o $(BINDIRTEST)/String.o	
+#ErrorTokenTarget :  $(SRCDIR)/ErrorToken.cpp
+#	g++ $(CFLAGS) $(SRCDIR)/ErrorToken.cpp -o $(OBJDIR)/ErrorToken.o
+#
+#IntegerTokenTarget :  $(SRCDIR)/IntegerToken.cpp
+#	g++ $(CFLAGS) $(SRCDIR)/IntegerToken.cpp -o $(OBJDIR)/IntegerToken.o
+#	
+#SymbolTokenTarget :  $(SRCDIR)/SymbolToken.cpp
+#	g++ $(CFLAGS) $(SRCDIR)/SymbolToken.cpp -o $(OBJDIR)/SymbolToken.o
+
+#ScannerStringTarget: $(SHARED_SRCDIR)/String.cpp
+#	g++ $(CFLAGS) $(SHARED_SRCDIR)/String.cpp -o $(BINDIRTEST)/String.o	
+#
+#BufferTarget: $(SHARED_SRCDIR)/Buffer.cpp
+#	g++ $(CFLAGS) $(SHARED_SRCDIR)/Buffer.cpp -o $(BINDIRTEST)/Buffer.o
+#		
+#SymbolTableTarget: $(SHARED_SRCDIR)/SymbolTable.cpp
+#	g++ $(CFLAGS) $(SHARED_SRCDIR)/SymbolTable.cpp -o $(BINDIRTEST)/SymbolTable.o		
+#	
+#AutomatTarget: $(SHARED_SRCDIR)/Automat.cpp
+#	g++ $(CFLAGS) $(SHARED_SRCDIR)/Automat.cpp -o $(BINDIRTEST)/Automat.o	
 
 TestScannerTarget :  $(SRCDIR)/TestScanner.cpp
 	g++ $(CFLAGS) $(SRCDIR)/TestScanner.cpp  -o $(BINDIRTEST)/TestScanner.o
@@ -68,7 +81,7 @@ cleanScanner:
 # dieses Target wird vom makefile des Gesamtprojekts verwendet
 # objs fuer Gesamtprojekt loeschen und dann neu erzeugen
 ScannerOBJTarget:
-	$(MAKE) ScannerTarget ErrorTokenTarget IntegerTokenTarget SymbolTokenTarget ScannerStringTarget
+	$(MAKE) ScannerTarget BaseTokenTarget ScannerStringTarget
 
 
 #SYMBOLTABLEDIR = ../Symboltable

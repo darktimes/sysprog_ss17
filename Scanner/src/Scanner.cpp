@@ -19,9 +19,14 @@ Scanner::Scanner(const char* filepath, SymbolTable* symtab) {
 	this->automat = new Automat(this);
 	this->symtab = symtab;
 	this->currentToken = nullptr;
-	this->currentLine = 0;
-	this->currentPos = 0;
+//	this->currentLine = 0;
+//	this->currentPos = 0;
 	this->active = false;
+
+	this->tokenInfm.line = 0;
+	this->tokenInfm.pos = 0;
+//	this->tokenInfm->line = 0;
+//	this->tokenInfm->pos = 0;
 }
 
 Scanner::~Scanner() {
@@ -29,12 +34,12 @@ Scanner::~Scanner() {
 	delete automat;
 }
 
-IToken *Scanner::nextToken() {
+BaseToken *Scanner::nextToken() {
 	active = true;
 	delete currentToken;
 
-	this->currentLine = buffer->getCurrentLine();
-	this->currentPos = buffer->getCurrentPos();
+	this->tokenInfm.line = buffer->getCurrentLine();
+	this->tokenInfm.pos = buffer->getCurrentPos();
 
 	while (active) { /*if no symbols in buffer => \0 */
 		if (currentToken == nullptr) {
@@ -53,20 +58,38 @@ IToken *Scanner::nextToken() {
 void Scanner::mkToken(TokenType tokenType, String* lexem) {
 	active = false;
 
+//	if (tokenType == TokenIdentifier) {
+//		currentToken = new SymbolToken(tokenType, currentLine, currentPos, symtab->create(*lexem));
+//	} else if (tokenType == TokenInteger) {
+//		errno = 0;
+//		long int tempInt = strtol(lexem->getStr(), NULL, 10);
+//		if (errno == ERANGE) {
+//			std::cout << "Integer conversion is outside a function's range. Overflow. \n";
+//		} else if ((tempInt < INT_MIN) || (tempInt > INT_MAX)) {
+//			std::cout << "Integer overflow \n";
+//		}
+//		currentToken = new IntegerToken(tokenType, currentLine, currentPos, tempInt);
+//	} else if (tokenType == TokenUnknown) {
+//		currentToken = new ErrorToken(tokenType, currentLine, currentPos, buffer->getChar());
+//	}
+
 	if (tokenType == TokenIdentifier) {
-		currentToken = new SymbolToken(tokenType, currentLine, currentPos, symtab->create(*lexem));
+		currentToken = new SymbolToken(tokenType, tokenInfm, symtab->create(*lexem));
 	} else if (tokenType == TokenInteger) {
 		errno = 0;
-		long int tempInt = strtol(lexem->getStr(), NULL, 10);
-		if (errno == ERANGE) {
-			std::cout << "Integer conversion is outside a function's range. Overflow. \n";
-		} else if ((tempInt < INT_MIN) || (tempInt > INT_MAX)) {
-			std::cout << "Integer overflow \n";
-		}
-		currentToken = new IntegerToken(tokenType, currentLine, currentPos, tempInt);
-	} else if (tokenType == TokenUnknown) {
-		currentToken = new ErrorToken(tokenType, currentLine, currentPos, buffer->getChar());
+				long int tempInt = strtol(lexem->getStr(), NULL, 10);
+				if (errno == ERANGE) {
+					throw std::runtime_error("Integer conversion is outside a function's range. Overflow");
+					//std::cout << "Integer conversion is outside a function's range. Overflow. \n";
+				} else if ((tempInt < INT_MIN) || (tempInt > INT_MAX)) {
+					throw std::runtime_error("Integer overflow");
+					//std::cout << "Integer overflow \n";
+				}
+		currentToken = new BaseToken(tokenType, tokenInfm, lexem);
+	} else {
+		currentToken = new BaseToken(tokenType, tokenInfm, lexem);
 	}
+
 }
 
 void Scanner::ungetChar(int number) {

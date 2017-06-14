@@ -9,19 +9,19 @@
 #include "IScanner.h"
 #include "SymbolTable.h"
 #include "Automat.h"
-#include "IntegerToken.h"
+#include "BaseToken.h"
+//#include "IntegerToken.h"
 #include "SymbolToken.h"
-#include "ErrorToken.h"
+//#include "ErrorToken.h"
 #include "TokenType.h"
 #include "Buffer.h"
-#include "IToken.h"
 
 class Scanner: public IScanner {
 public:
 	Scanner(const char* filepath, SymbolTable *symtab);
 	virtual ~Scanner();
 	bool active;
-	IToken *nextToken(void);
+	BaseToken *nextToken(void);
 	void mkToken(TokenType tokenType, String* lexem);
 	void ungetChar(int number);
 
@@ -31,11 +31,12 @@ private:
 	Buffer *buffer;
 	Automat *automat;
 	SymbolTable *symtab;
-	IToken *currentToken;
-	int currentLine;
-	int currentPos;
+	BaseToken *currentToken;
+//	int currentLine;
+//	int currentPos;
+	tokenInfo tokenInfm;
 
-	IToken *createToken(TokenType tokenType, int row, int column, char *lexem);
+	BaseToken *createToken(TokenType tokenType, tokenInfo tokenInf, char *lexem);
 
 };
 

@@ -1,21 +1,11 @@
-/*
- * SymbolToken.cpp
- *
- *  Created on: Jun 7, 2017
- *      Author: vladimir
- */
-
 #include "SymbolToken.h"
 
-SymbolToken::SymbolToken(TokenType tokenType, int line, int pos, Symbol* symbol) {
+SymbolToken::SymbolToken(TokenType tokenType, tokenInfo tokenInf, Symbol* symbol) {
 	this->tokenType = tokenType;
-	this->line = line;
-	this->pos = pos;
+	this->tokenInf = tokenInf;
 	this->symbol = symbol;
 }
 
 SymbolToken::~SymbolToken() {
 
 }
-
-

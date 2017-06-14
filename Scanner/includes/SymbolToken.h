@@ -1,22 +1,12 @@
-/*
- * SymbolToken.h
- *
- *  Created on: Jun 7, 2017
- *      Author: vladimir
- */
-
 #pragma once
 
-#include "IToken.h"
+#include "BaseToken.h"
 #include "SymbolTable.h"
 
-class SymbolToken: public IToken {
+class SymbolToken: public BaseToken {
 public:
-	SymbolToken(TokenType tokenType, int line, int pos, Symbol* symbol);
+	SymbolToken(TokenType tokenType, tokenInfo tokenInf, Symbol* symbol);
 	virtual ~SymbolToken();
 private:
-	TokenType tokenType;
-	int line;
-	int pos;
 	Symbol* symbol;
 };
