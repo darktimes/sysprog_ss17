@@ -19,9 +19,9 @@ int main(int argc, char **argv) {
 	outputStream.open(outputFileName.getStr());
 	while (scanner->nextToken()) {
 		String lexem = (scanner->currentToken->lexem->getSize() <= 2) ? String(wrapChar(*scanner->currentToken->lexem[0])) : *scanner->currentToken->lexem;
-		outputStream<<"TokenType: "<<tokenToString(scanner->currentToken->tokenType)<<", lexem: ";
+		outputStream<<"TokenType:"<<tokenToString(scanner->currentToken->tokenType)<<", "<<'\t'<<'\t'<<'\t'<<"lexem: ";
 		outputStream<<lexem;
-		outputStream<<", line: "<<scanner->currentToken->tokenInfo->line<<", pos: "<<scanner->currentToken->tokenInfo->pos<<std::endl;
+		outputStream<<'\t'<<'\t'<<'\t'<<"line:"<<scanner->currentToken->tokenInfo->line<<", "<<'\t'<< "pos:"<<'\t'<<scanner->currentToken->tokenInfo->pos<<std::endl;
 
 	}
 	outputStream.close();
