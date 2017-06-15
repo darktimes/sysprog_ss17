@@ -14,8 +14,11 @@ Scanner::Scanner(const char* filepath, SymbolTable* symtab) {
 	this->currentToken = nullptr;
 	this->isScanningToken= false;
 	this->finished = false;
-
 	this->currentTokenInfo = nullptr;
+
+	if (buffer->isNoFile()) {
+		std::cout<<"There was an error opening the file.";
+	}
 
 }
 
@@ -28,7 +31,7 @@ BaseToken *Scanner::nextToken() {
 	currentToken = nullptr;
 	currentTokenInfo = nullptr;
 
-	if (finished) {
+	if (finished || buffer->isNoFile()) {
 		return nullptr;
 	}
 	isScanningToken = true;

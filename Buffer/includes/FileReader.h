@@ -13,8 +13,10 @@ class FileReader{
 public:
     FileReader(const char* filePath);
     ~FileReader();
+    bool isOpen();
     BufferBlock* getBufferBlockAt(unsigned int blockIndex);
 
 private:
     std::ifstream* readFile;
+    bool opened;
 };

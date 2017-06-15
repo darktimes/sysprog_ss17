@@ -11,6 +11,7 @@ Buffer::Buffer(const char* filePath) {
     stepBackAmount = 0;
     currentBufferBlock = nullptr;
     eofConsumed = false;
+    noFile = !fileReader->isOpen();
 }
 
 Buffer::~Buffer() {
@@ -135,3 +136,8 @@ void Buffer::adjustIndiciesIn(int steps) {
 bool Buffer::isEOF() {
 	return eofConsumed;
 }
+
+bool Buffer::isNoFile() {
+	return noFile;
+}
+

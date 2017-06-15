@@ -2,6 +2,7 @@
 
 FileReader::FileReader(const char* filePath) {
     readFile = new std::ifstream(filePath);
+    opened = readFile->is_open();
 }
 
 FileReader::~FileReader() {
@@ -9,7 +10,7 @@ FileReader::~FileReader() {
 }
 BufferBlock* FileReader::getBufferBlockAt(unsigned int blockIndex)
 {
-    if (!readFile->is_open()) {
+    if (!opened) {
         throw std::runtime_error("Couldn't open the file.");
     }
         
@@ -23,6 +24,10 @@ BufferBlock* FileReader::getBufferBlockAt(unsigned int blockIndex)
     	length -= 1;
     }
     return new BufferBlock(blockContent, length);
+}
+
+bool FileReader::isOpen() {
+	return opened;
 }
 
 

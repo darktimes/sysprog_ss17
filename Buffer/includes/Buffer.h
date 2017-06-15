@@ -24,9 +24,11 @@ public:
 	static const unsigned int MAX_STEPBACK;
 
 	bool isEOF();
+	bool isNoFile();
 
 private:
 	bool eofConsumed;
+	bool noFile;
     FileReader* fileReader;
     BufferBlock* currentBufferBlock;
     void switchToNextBlock();
