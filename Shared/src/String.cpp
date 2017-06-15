@@ -1,10 +1,3 @@
-/*
- * String.cpp
- *
- *  Created on: 1 Nov 2016
- *      Author: David Seifried
- */
-
 #include "../includes/String.h"
 // Default constructor (own implementation)
 String::String() {

@@ -27,7 +27,7 @@ CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_HEADERDIR) -I$(SCANNER_S
 # -g --> debug Informationen erzeugen
 # -o --> name des output-files
 
-makeTestAutomat: AutomatTarget AutomatStatesTarget AutomatStringTarget TestAutomatTarget
+makeTestAutomat: AutomatTarget AutomatStatesTarget AutomatStringTarget AutomatTokenTypeTarget TestAutomatTarget
 	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o -o $(BINDIRTEST)/AutomatTest
 	
 
@@ -47,6 +47,8 @@ AutomatStatesTarget :  $(SRCDIR)/States.cpp
 AutomatStringTarget: $(SHARED_SRCDIR)/String.cpp
 	g++ $(CFLAGS) $(SHARED_SRCDIR)/String.cpp -o $(BINDIRTEST)/String.o	
 
+AutomatTokenTypeTarget: $(SHARED_SRCDIR)/TokenType.cpp
+	g++ $(CFLAGS) $(SHARED_SRCDIR)/TokenType.cpp -o $(BINDIRTEST)/TokenType.o	
 
 # TestAutomat.o ist abhängig von src/TestAutomat.cpp und src/Automat.h
 TestAutomatTarget :  $(SRCDIR)/TestAutomat.cpp
@@ -64,5 +66,5 @@ cleanAutomat:
 # dieses Target wird vom makefile des Gesamtprojekts verwendet
 # objs fuer Gesamtprojekt loeschen und dann neu erzeugen
 AutomatOBJTarget:
-	$(MAKE) AutomatTarget AutomatStringTarget AutomatStatesTarget
+	$(MAKE) AutomatTarget AutomatStatesTarget
 

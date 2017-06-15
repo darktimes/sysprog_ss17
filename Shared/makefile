@@ -9,12 +9,13 @@ OBJDIR = objs
 
 # enthaelt die Objectfiles und das ausfuehrbare File zum Testen des Teilprojekts
 
-CFLAGS=-g -c -Wall -std=c++11
-
-CPPFLAGS=-I$(HEADERDIR) 
+CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) 
 
 String: $(SRCDIR)/String.cpp
 	g++ $(CFLAGS) $(SRCDIR)/String.cpp -o $(OBJDIR)/String.o	
+
+TokenType: $(SRCDIR)/TokenType.cpp
+	g++ $(CFLAGS) $(SRCDIR)/TokenType.cpp -o $(OBJDIR)/TokenType.o
 
 
 cleanShared:
@@ -24,5 +25,5 @@ cleanShared:
 # dieses Target wird vom makefile des Gesamtprojekts verwendet
 # objs fuer Gesamtprojekt loeschen und dann neu erzeugen
 SharedOBJTarget:
-	$(MAKE) String
+	$(MAKE) String TokenType
 

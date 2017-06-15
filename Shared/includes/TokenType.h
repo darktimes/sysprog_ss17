@@ -2,7 +2,7 @@
  * TokenType.h
  *
  *  Created on: 25 Oct 2016
- *      Author: David Seifried
+ *      Author: fattum
  */
 
 #pragma once
@@ -38,4 +38,7 @@ typedef enum e_TokenType {
 	TokenLengthExceeded	// if token was too long
 } TokenType;
 
+const char* tokenToString(TokenType type);
+
+const char* wrapChar(const char& c);
 

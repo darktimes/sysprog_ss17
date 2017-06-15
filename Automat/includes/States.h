@@ -1,10 +1,3 @@
-/*
- * States.h
- * State's abstract class
- *  Created on: Oct 26, 2016
- *      Author: Sergey
- */
-
 #pragma once
 
 #include "IState.h"

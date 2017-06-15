@@ -1,10 +1,3 @@
-/*
- * IScanner.h
- *
- *  Created on: 27 Oct 2016
- *      Author: David Seifried
- */
-
 #pragma once
 
 #include "String.h"

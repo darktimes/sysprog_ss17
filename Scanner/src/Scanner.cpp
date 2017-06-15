@@ -1,10 +1,3 @@
-/*
- * Scanner.cpp
- *
- *  Created on: Sep 26, 2012
- *      Author: knad0001
- */
-
 #include "Scanner.h"
 
 #include <iostream> //std out
@@ -62,11 +55,10 @@ void Scanner::mkToken(TokenType tokenType, String* lexem) {
 			throw std::runtime_error("Integer overflow");
 		}
 		currentToken = new BaseToken(tokenType, currentTokenInfo, lexem);
-	}
-	else if (tokenType == TokenEOF) {
-		finished = true;
-	}
-	else {
+	} else {
+		if (tokenType == TokenEOF) {
+				finished = true;
+			}
 		currentToken = new BaseToken(tokenType, currentTokenInfo, lexem);
 	}
 

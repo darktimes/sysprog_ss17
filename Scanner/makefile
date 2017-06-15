@@ -58,7 +58,7 @@ cleanScanner:
 # dieses Target wird vom makefile des Gesamtprojekts verwendet
 # objs fuer Gesamtprojekt loeschen und dann neu erzeugen
 ScannerOBJTarget:
-	$(MAKE) ScannerTarget BaseTokenTarget makeTestScanner
+	$(MAKE) makeTestScanner
 
 
 #SYMBOLTABLEDIR = ../Symboltable

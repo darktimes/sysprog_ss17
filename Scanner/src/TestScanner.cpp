@@ -12,7 +12,9 @@ int main(int argc, char **argv) {
 	Scanner* scanner = new Scanner(argv[1], symTable);
 
 	while (scanner->nextToken()) {
-		std::cout<<"TokenType: "<<scanner->currentToken->tokenType<<", lexem: "<<*(scanner->currentToken->lexem);
+		String lexem = (scanner->currentToken->lexem->getSize() <= 2) ? String(wrapChar(*scanner->currentToken->lexem[0])) : *scanner->currentToken->lexem;
+		std::cout<<"TokenType: "<<tokenToString(scanner->currentToken->tokenType)<<", lexem: ";
+		std::cout<<lexem;
 		std::cout<<", line: "<<scanner->currentToken->tokenInfo->line<<", pos: "<<scanner->currentToken->tokenInfo->pos<<std::endl;
 	}
 }

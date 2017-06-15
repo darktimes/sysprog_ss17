@@ -1,9 +1,3 @@
-/*
- * String.h
- *
- *  Created on: 1 Nov 2016
- *      Author: David Seifried
- */
 #pragma once
 
 /*

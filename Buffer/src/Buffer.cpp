@@ -1,10 +1,3 @@
-/*
- * Buffer.cpp
- *
- *  Created on: Sep 26, 2012
- *      Author: knad0001
- */
-
 #include "Buffer.h"
 
 const unsigned int Buffer::BLOCK_SIZE = 6;
