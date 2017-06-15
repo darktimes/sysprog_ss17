@@ -22,12 +22,12 @@ bool State::isAcceptable() {
 void State::fallback(const int& count, Automat* automat) {
 	automat->getScanner()->ungetChar(count);
 	if (count == 1) {
-
 		createToken(automat);
 
 	} else {
 		automat->getLastFinalState()->createToken(automat);
 	}
+
 	automat->changeState(new StateInit());
 }
 
@@ -71,12 +71,16 @@ bool isAcceptableSign(const char& c) {
 //------------------------------------------------------------------------------------------------------------------------------------
 // StateInit
 //------------------------------------------------------------------------------------------------------------------------------------
+
 void StateInit::processChar(const char& c, Automat* automat) {
+
 	if (isDigit(c)) {
 		automat->changeState(new StateInteger(c));
 	} else if (isLetter(c)) {
+
 		automat->changeState(new StateIdentifier(c));
 	} else if (isAcceptableSign(c)) {
+
 		if (c == ':') {
 			automat->changeState(new StateColon(c));
 		} else if (c == '=') {
@@ -87,13 +91,12 @@ void StateInit::processChar(const char& c, Automat* automat) {
 			automat->changeState(new StateSigns(c));
 		}
 	} else if (c == ' ' || c == '\n' || c == '\t')  {
+
 		automat->changeState(new StateSeparator(c));
-	} else if (c == '\0') {
-		//automat->getScanner()->mkToken(TokenEOF, '\0');
-		createToken(automat);
+	} else if ((int)c == 0) {
+		automat->getScanner()->mkToken(TokenEOF, new String());
 		automat->changeState(new StateFinished());
 	} else {
-		//adding single character on the empty string works wrong
 		*_lexem = String(c);
 		createToken(automat);
 		automat->changeState(new StateInit());
@@ -101,7 +104,7 @@ void StateInit::processChar(const char& c, Automat* automat) {
 }
 
 void StateInit::createToken(Automat* automat) {
-	automat->getScanner()->mkToken(TokenEOF, _lexem);
+	automat->getScanner()->mkToken(TokenUnknown, _lexem);
 }
 //------------------------------------------------------------------------------------------------------------------------------------
 // StateFinished
@@ -239,9 +242,12 @@ void StateColonAsterix::createToken(Automat* automat) {
 void StateColonAsterixAsterix::processChar(const char& c, Automat* automat) {
 	if (c == ':') {
 		automat->changeState(new StateColonAsterixAsterixColon(new String(*(_lexem) + c)));
-	} else if (c != '\0'){
+	} else if (c == '*') {
+		*(_lexem) += c;
+	} else if (c != '\0') {
 		automat->changeState(new StateColonAsterix(new String(*(_lexem) + c)));
-	} else {
+	} else  {
+
 		fallback(1, automat);
 	}
 }
@@ -255,6 +261,7 @@ void StateColonAsterixAsterix::createToken(Automat* automat) {
 //------------------------------------------------------------------------------------------------------------------------------------
 void StateColonAsterixAsterixColon::createToken(Automat* automat) {
 	automat->getScanner()->mkToken(TokenComment, _lexem);
+
 }
 
 

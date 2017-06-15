@@ -23,8 +23,8 @@ Scanner::Scanner(const char* filepath, SymbolTable* symtab) {
 //	this->currentPos = 0;
 	this->active = false;
 
-	this->tokenInfm.line = 0;
-	this->tokenInfm.pos = 0;
+	this->tokenInfo.line = 0;
+	this->tokenInfo.pos = 0;
 //	this->tokenInfm->line = 0;
 //	this->tokenInfm->pos = 0;
 }
@@ -38,8 +38,8 @@ BaseToken *Scanner::nextToken() {
 	active = true;
 	delete currentToken;
 
-	this->tokenInfm.line = buffer->getCurrentLine();
-	this->tokenInfm.pos = buffer->getCurrentPos();
+	this->tokenInfo.line = buffer->getCurrentLine();
+	this->tokenInfo.pos = buffer->getCurrentPos();
 
 	while (active) { /*if no symbols in buffer => \0 */
 		automat->process(buffer->getChar());
@@ -74,7 +74,7 @@ void Scanner::mkToken(TokenType tokenType, String* lexem) {
 //	}
 
 	if (tokenType == TokenIdentifier) {
-		currentToken = new SymbolToken(tokenType, tokenInfm, symtab->create(*lexem));
+		currentToken = new SymbolToken(tokenType, tokenInfo, symtab->create(*lexem));
 	} else if (tokenType == TokenInteger) {
 		errno = 0;
 		long int tempInt = strtol(lexem->getStr(), NULL, 10);
@@ -85,9 +85,9 @@ void Scanner::mkToken(TokenType tokenType, String* lexem) {
 			throw std::runtime_error("Integer overflow");
 			//std::cout << "Integer overflow \n";
 		}
-		currentToken = new BaseToken(tokenType, tokenInfm, lexem);
+		currentToken = new BaseToken(tokenType, tokenInfo, lexem);
 	} else {
-		currentToken = new BaseToken(tokenType, tokenInfm, lexem);
+		currentToken = new BaseToken(tokenType, tokenInfo, lexem);
 	}
 
 }

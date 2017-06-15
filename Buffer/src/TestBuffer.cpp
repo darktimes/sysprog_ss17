@@ -4,12 +4,12 @@
 
 using namespace std;
 
-int main(void) {
+int main(int argc, char** argv) {
 
 //	FileReader fileReader = new FileReader("test.txt");
 
 
-	Buffer* buffer = new Buffer("test.txt");
+	Buffer* buffer = new Buffer(argv[1]);
 
 	while (!buffer->isEOF()) {
 		char c = buffer->getChar();

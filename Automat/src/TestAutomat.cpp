@@ -92,9 +92,10 @@ public:
 int main (int argc, char* argv[]) {
 	IScannerStub* scanner = new IScannerStub();
 	Automat* automat = new Automat(scanner);
-	String* abc = new String("aaa234\n\nkorrekt\nein Identifier aaa234\n\nxxxxxx\n\n1234bbb\n\nkorrekt\nein Integer 1234 und ein Identifier bbb:**************: :*********:");
+	String* abc = new String("aaa234\n\nkorrekt\nein Identifier aaa234\n\nxxxxxx\n\n1234bbb\n\nkorrekt\nein Integer 1234 und ein Identifier bbb:**************: :*********");
 	//String* abc = new String("aaa234");
 	for (; scanner->readPos < abc->getSize(); scanner->readPos++) {
+		//std::cout<<"Processing char["<<scanner->readPos<<"]"<<std::endl;
 		automat->process((*abc)[scanner->readPos]);
 	}
 }

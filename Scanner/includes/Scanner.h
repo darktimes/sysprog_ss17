@@ -34,7 +34,7 @@ private:
 
 //	int currentLine;
 //	int currentPos;
-	TokenInfo tokenInfm;
+	TokenInfo tokenInfo;
 
 	BaseToken *createToken(TokenType tokenType, TokenInfo tokenInf, char *lexem);
 
