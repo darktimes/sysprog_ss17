@@ -110,11 +110,13 @@ void StateInit::createToken(Automat* automat) {
 // StateFinished
 //------------------------------------------------------------------------------------------------------------------------------------
 void StateFinished::processChar(const char& c, Automat* automat) {
+	std::runtime_error("Can non process char, if automat is in halted state.");
 		//throw exception or something
 }
 
 void StateFinished::createToken(Automat* automat) {
-	automat->getScanner()->mkToken(TokenEOF, '\0');
+	std::runtime_error("Can non process char, if automat is in halted state.");
+//	automat->getScanner()->mkToken(TokenEOF, '\0');
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------

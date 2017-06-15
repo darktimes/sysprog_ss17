@@ -20,7 +20,7 @@ class Scanner: public IScanner {
 public:
 	Scanner(const char* filepath, SymbolTable *symtab);
 	virtual ~Scanner();
-	bool active;
+
 	BaseToken *nextToken(void);
 	void mkToken(TokenType tokenType, String* lexem);
 	void ungetChar(int number);
@@ -31,12 +31,11 @@ private:
 	Buffer *buffer;
 	Automat *automat;
 	SymbolTable *symtab;
+	bool isScanningToken;
+	bool finished;
+	TokenInfo* currentTokenInfo;
 
-//	int currentLine;
-//	int currentPos;
-	TokenInfo tokenInfo;
 
-	BaseToken *createToken(TokenType tokenType, TokenInfo tokenInf, char *lexem);
 
 };
 

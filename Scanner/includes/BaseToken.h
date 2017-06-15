@@ -10,16 +10,17 @@
 #include "String.h"
 
 struct TokenInfo {
+		TokenInfo(int line, int pos);
 		int line;
 		int pos;
 	};
 
 class BaseToken {
 public:
-	BaseToken(TokenType tokenType, TokenInfo tokenInfo, String *lexem);
+	BaseToken(TokenType tokenType, TokenInfo* tokenInfo, String *lexem);
+	TokenInfo* tokenInfo;
 	String* lexem;
 	TokenType tokenType;
-	TokenInfo tokenInfo;
 	virtual ~BaseToken();
 protected:
 

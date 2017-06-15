@@ -12,8 +12,8 @@ int main(int argc, char **argv) {
 	Scanner* scanner = new Scanner(argv[1], symTable);
 
 	while (scanner->nextToken()) {
-		std::cout<<"TokenType: "<<scanner->currentToken->tokenType<<", lexem: "<<*(scanner->currentToken->lexem)
-				<<", line: "<<scanner->currentToken->tokenInfo.line<<", pos: " + scanner->currentToken->tokenInfo.pos<<std::endl;
+		std::cout<<"TokenType: "<<scanner->currentToken->tokenType<<", lexem: "<<*(scanner->currentToken->lexem);
+		std::cout<<", line: "<<scanner->currentToken->tokenInfo->line<<", pos: "<<scanner->currentToken->tokenInfo->pos<<std::endl;
 	}
 }
 
