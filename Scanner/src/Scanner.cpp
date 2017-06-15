@@ -42,16 +42,16 @@ BaseToken *Scanner::nextToken() {
 	this->tokenInfm.pos = buffer->getCurrentPos();
 
 	while (active) { /*if no symbols in buffer => \0 */
-		if (currentToken == nullptr) {
-			automat->process(buffer->getChar());
-		} else {
-			//this->currentLine = 0;
-			//this->currentPos = 0;
-			return currentToken;
-		}
+		automat->process(buffer->getChar());
+//		if (currentToken == nullptr) {
+//
+//		} else {
+//			return currentToken;
+//		}
 	}
 
-	throw std::runtime_error("Reached end of nextToken while being active.");
+	return currentToken;
+	//throw std::runtime_error("Reached end of nextToken while being active.");
 	//active, EOF
 }
 
@@ -77,14 +77,14 @@ void Scanner::mkToken(TokenType tokenType, String* lexem) {
 		currentToken = new SymbolToken(tokenType, tokenInfm, symtab->create(*lexem));
 	} else if (tokenType == TokenInteger) {
 		errno = 0;
-				long int tempInt = strtol(lexem->getStr(), NULL, 10);
-				if (errno == ERANGE) {
-					throw std::runtime_error("Integer conversion is outside a function's range. Overflow");
-					//std::cout << "Integer conversion is outside a function's range. Overflow. \n";
-				} else if ((tempInt < INT_MIN) || (tempInt > INT_MAX)) {
-					throw std::runtime_error("Integer overflow");
-					//std::cout << "Integer overflow \n";
-				}
+		long int tempInt = strtol(lexem->getStr(), NULL, 10);
+		if (errno == ERANGE) {
+			throw std::runtime_error("Integer conversion is outside a function's range. Overflow");
+			//std::cout << "Integer conversion is outside a function's range. Overflow. \n";
+		} else if ((tempInt < INT_MIN) || (tempInt > INT_MAX)) {
+			throw std::runtime_error("Integer overflow");
+			//std::cout << "Integer overflow \n";
+		}
 		currentToken = new BaseToken(tokenType, tokenInfm, lexem);
 	} else {
 		currentToken = new BaseToken(tokenType, tokenInfm, lexem);

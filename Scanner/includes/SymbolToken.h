@@ -5,7 +5,7 @@
 
 class SymbolToken: public BaseToken {
 public:
-	SymbolToken(TokenType tokenType, tokenInfo tokenInf, Symbol* symbol);
+	SymbolToken(TokenType tokenType, TokenInfo tokenInf, Symbol* symbol);
 	virtual ~SymbolToken();
 private:
 	Symbol* symbol;

@@ -26,7 +26,7 @@ SymbolTableTarget : $(SRCDIR)/SymbolTable.cpp
 	g++ $(CFLAGS) $(SRCDIR)/SymbolTable.cpp -o $(OBJDIR)/SymbolTable.o
 
 SymbolStringTarget : $(SHARED_SRCDIR)/String.cpp
-	g++ $(CFLAGS) $(SHARED_SRCDIR)/String.cpp -o $(OBJDIR)/String.o	
+	g++ $(CFLAGS) $(SHARED_SRCDIR)/String.cpp -o $(BINDIRTEST)/String.o	
  	
 TestSymbolTableTarget : $(SRCDIR)/TestSymbolTable.cpp $(HEADERDIR)/SymbolTable.h
 	g++ $(CFLAGS) $(SRCDIR)/TestSymbolTable.cpp -o $(BINDIRTEST)/TestSymbolTable.o  
@@ -48,4 +48,3 @@ cleanSymbolTable:
 SymbolTableOBJTarget:
 	$(MAKE) SymbolTableTarget
 
-	

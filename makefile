@@ -46,6 +46,7 @@ sharedOBJs:
 	$(MAKE) -C $(SHAREDDIR) SharedOBJTarget
 
 scanner: 
-	$(MAKE) -C $(SCANNERDIR) makeTestScanner
+	$(MAKE) -C $(SCANNERDIR) ScannerOBJTarget
+
 
 	

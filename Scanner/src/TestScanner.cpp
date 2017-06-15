@@ -3,16 +3,17 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
+	if (argc != 2) {
+		std::cout<<"No file to test provided. Exiting..."<<std::endl;
+		return -1;
+	}
 
-//	Scanner* scanner;
-//
-//	const char* path = "/home/vladimir/workspace/sysprog_ss17/Scanner/src/test.txt";
-//	SymbolTable* symtab = new SymbolTable();
-//
-//	scanner = new Scanner(path, symtab);
-//
-//
-//	std::cout << "this is a test \n";
-//	std::cout << "Next token is: " << scanner->nextToken() << std::endl;
+	SymbolTable* symTable = new SymbolTable();
+	Scanner* scanner = new Scanner(argv[1], symTable);
+
+	while (scanner->nextToken()) {
+		std::cout<<"TokenType: "<<scanner->currentToken->tokenType<<", lexem: "<<*(scanner->currentToken->lexem)
+				<<", line: "<<scanner->currentToken->tokenInfo.line<<", pos: " + scanner->currentToken->tokenInfo.pos<<std::endl;
+	}
 }
 

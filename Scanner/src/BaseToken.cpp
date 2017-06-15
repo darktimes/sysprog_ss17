@@ -1,8 +1,8 @@
 #include "BaseToken.h"
 
-BaseToken::BaseToken(TokenType tokenType, tokenInfo tokenInf, String *lexem) {
+BaseToken::BaseToken(TokenType tokenType, TokenInfo tokenInf, String *lexem) {
 	this->tokenType = tokenType;
-	this->tokenInf = tokenInf;
+	this->tokenInfo = tokenInf;
 	this->lexem = lexem;
 }
 

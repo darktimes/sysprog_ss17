@@ -9,9 +9,9 @@ FileReader::~FileReader() {
 }
 BufferBlock* FileReader::getBufferBlockAt(unsigned int blockIndex)
 {
-    if (!readFile->is_open())
+    if (!readFile->is_open()) {
         throw std::runtime_error("Couldn't open the file.");
-        
+    }
         
     char* blockContent = new char[Buffer::BLOCK_SIZE];
     readFile->seekg(blockIndex * Buffer::BLOCK_SIZE);

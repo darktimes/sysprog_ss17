@@ -9,18 +9,20 @@
 #include "TokenType.h"
 #include "String.h"
 
-struct tokenInfo {
+struct TokenInfo {
 		int line;
 		int pos;
 	};
 
 class BaseToken {
 public:
-	BaseToken(TokenType tokenType, tokenInfo tokenInf, String *lexem);
-	virtual ~BaseToken();
-private:
-	TokenType tokenType;
-	tokenInfo tokenInf;
+	BaseToken(TokenType tokenType, TokenInfo tokenInfo, String *lexem);
 	String* lexem;
+	TokenType tokenType;
+	TokenInfo tokenInfo;
+	virtual ~BaseToken();
+protected:
+
+
 };
 

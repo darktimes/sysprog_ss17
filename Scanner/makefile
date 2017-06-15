@@ -12,9 +12,6 @@ OBJDIR = objs
 # enthaelt das ausfuehrbare File zum Testen
 BINDIRTEST = debug
 
-AUTOMATHEADER = ../Automat/includes
-
-BUFFER_HEADER_DIR = ../Buffer/includes
 
 # enthaelt die Header Files
 HEADERDIR = includes
@@ -22,9 +19,10 @@ HEADERDIR = includes
 # enthaelt die Source Files
 SRCDIR = src
 
-SHARED_HEADERDIR = ../Shared/includes
-
-SYMTABLE_HEADERDIR = ../SymbolTable/includes
+SYMTABLE_DIR = ../SymbolTable
+BUFFER_DIR = ../Buffer
+SHARED_DIR = ../Shared
+AUTOMAT_DIR = ../Automat
 
 #SHARED_SRCDIR = ../Shared/src
 
@@ -33,42 +31,21 @@ OBJDIR = objs
 
 # enthaelt die Objectfiles und das ausfuehrbare File zum Testen des Teilprojekts
 
-CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_HEADERDIR) -I$(AUTOMATHEADER) -I$(SYMTABLE_HEADERDIR) -I$(BUFFER_HEADER_DIR)
+CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_DIR)/$(HEADERDIR) -I$(AUTOMAT_DIR)/$(HEADERDIR) -I$(SYMTABLE_DIR)/$(HEADERDIR) -I$(BUFFER_DIR)/$(HEADERDIR)
 
 CPPFLAGS=-I$(HEADERDIR) 
 
-makeTestScanner: ScannerTarget BaseTokenTarget TestScannerTarget
-#	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o -o $(BINDIRTEST)/ScannerTest
-
-
+makeTestScanner: ScannerTarget BaseTokenTarget TestScannerTarget SymbolTokenTarget
+	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o $(SHARED_DIR)/$(OBJDIR)/*.o $(AUTOMAT_DIR)/$(OBJDIR)/*.o $(BUFFER_DIR)/$(OBJDIR)/*.o $(SYMTABLE_DIR)/$(OBJDIR)/*.o -o $(BINDIRTEST)/ScannerTest
 
 ScannerTarget :  $(SRCDIR)/Scanner.cpp 
 	g++ $(CFLAGS) $(SRCDIR)/Scanner.cpp -o $(OBJDIR)/Scanner.o
 
+SymbolTokenTarget : $(SRCDIR)/SymbolToken.cpp
+	g++ $(CFLAGS) $(SRCDIR)/SymbolToken.cpp -o $(OBJDIR)/SymbolToken.o
+
 BaseTokenTarget : $(SRCDIR)/BaseToken.cpp
 	g++ $(CFLAGS) $(SRCDIR)/BaseToken.cpp -o $(OBJDIR)/BaseToken.o
-
-
-#ErrorTokenTarget :  $(SRCDIR)/ErrorToken.cpp
-#	g++ $(CFLAGS) $(SRCDIR)/ErrorToken.cpp -o $(OBJDIR)/ErrorToken.o
-#
-#IntegerTokenTarget :  $(SRCDIR)/IntegerToken.cpp
-#	g++ $(CFLAGS) $(SRCDIR)/IntegerToken.cpp -o $(OBJDIR)/IntegerToken.o
-#	
-#SymbolTokenTarget :  $(SRCDIR)/SymbolToken.cpp
-#	g++ $(CFLAGS) $(SRCDIR)/SymbolToken.cpp -o $(OBJDIR)/SymbolToken.o
-
-#ScannerStringTarget: $(SHARED_SRCDIR)/String.cpp
-#	g++ $(CFLAGS) $(SHARED_SRCDIR)/String.cpp -o $(BINDIRTEST)/String.o	
-#
-#BufferTarget: $(SHARED_SRCDIR)/Buffer.cpp
-#	g++ $(CFLAGS) $(SHARED_SRCDIR)/Buffer.cpp -o $(BINDIRTEST)/Buffer.o
-#		
-#SymbolTableTarget: $(SHARED_SRCDIR)/SymbolTable.cpp
-#	g++ $(CFLAGS) $(SHARED_SRCDIR)/SymbolTable.cpp -o $(BINDIRTEST)/SymbolTable.o		
-#	
-#AutomatTarget: $(SHARED_SRCDIR)/Automat.cpp
-#	g++ $(CFLAGS) $(SHARED_SRCDIR)/Automat.cpp -o $(BINDIRTEST)/Automat.o	
 
 TestScannerTarget :  $(SRCDIR)/TestScanner.cpp
 	g++ $(CFLAGS) $(SRCDIR)/TestScanner.cpp  -o $(BINDIRTEST)/TestScanner.o
@@ -81,7 +58,7 @@ cleanScanner:
 # dieses Target wird vom makefile des Gesamtprojekts verwendet
 # objs fuer Gesamtprojekt loeschen und dann neu erzeugen
 ScannerOBJTarget:
-	$(MAKE) ScannerTarget BaseTokenTarget ScannerStringTarget
+	$(MAKE) ScannerTarget BaseTokenTarget makeTestScanner
 
 
 #SYMBOLTABLEDIR = ../Symboltable

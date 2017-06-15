@@ -24,19 +24,19 @@ public:
 	BaseToken *nextToken(void);
 	void mkToken(TokenType tokenType, String* lexem);
 	void ungetChar(int number);
-
+	BaseToken *currentToken;
 
 
 private:
 	Buffer *buffer;
 	Automat *automat;
 	SymbolTable *symtab;
-	BaseToken *currentToken;
+
 //	int currentLine;
 //	int currentPos;
-	tokenInfo tokenInfm;
+	TokenInfo tokenInfm;
 
-	BaseToken *createToken(TokenType tokenType, tokenInfo tokenInf, char *lexem);
+	BaseToken *createToken(TokenType tokenType, TokenInfo tokenInf, char *lexem);
 
 };
 

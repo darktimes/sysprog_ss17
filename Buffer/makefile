@@ -58,6 +58,4 @@ cleanBuffer:
 # dieses Target wird vom makefile des Gesamtprojekts verwendet
 # objs fuer GesamtProjekt loeschen und dann neu erzeugen
 BufferOBJTarget:
-	$(MAKE) BufferTarget FileReaderTarget
-
-	
+	$(MAKE) BufferTarget FileReaderTarget BufferBlockTarget
