@@ -22,6 +22,7 @@ public:
 	String& operator+=(const char&);
 
 	friend const String operator+(const String&, const char&);
+	friend const String operator+(const String&, const String&);
 	operator const char*();
 
 	int getSize() const;

@@ -7,6 +7,8 @@
 #include <limits.h>
 #include <stdexcept>
 
+const int Scanner::TOKEN_MAX_LENGTH = 128;
+
 Scanner::Scanner(const char* filepath, SymbolTable* symtab) {
 	this->buffer = new Buffer(filepath);
 	this->automat = new Automat(this);
@@ -15,9 +17,9 @@ Scanner::Scanner(const char* filepath, SymbolTable* symtab) {
 	this->isScanningToken= false;
 	this->finished = false;
 	this->currentTokenInfo = nullptr;
-
+	this->currentTokenLength = 0;
 	if (buffer->isNoFile()) {
-		std::cout<<"There was an error opening the file.";
+		std::cout<<"There was an error opening the file."<<std::endl;
 	}
 
 }
@@ -30,6 +32,7 @@ Scanner::~Scanner() {
 BaseToken *Scanner::nextToken() {
 	currentToken = nullptr;
 	currentTokenInfo = nullptr;
+	currentTokenLength = 0;
 
 	if (finished || buffer->isNoFile()) {
 		return nullptr;
@@ -40,24 +43,25 @@ BaseToken *Scanner::nextToken() {
 
 	while (isScanningToken) {
 		automat->process(buffer->getChar());
+		currentTokenLength++;
 	}
 	return currentToken;
 }
 
 void Scanner::mkToken(TokenType tokenType, String* lexem) {
 	isScanningToken = false;
-
-	if (tokenType == TokenIdentifier) {
+	if (currentTokenLength >= TOKEN_MAX_LENGTH) {
+		currentToken = new BaseToken(TokenLengthExceeded, currentTokenInfo, lexem);
+	} else if (tokenType == TokenIdentifier) {
 		currentToken = new SymbolToken(tokenType, currentTokenInfo, symtab->create(*lexem));
 	} else if (tokenType == TokenInteger) {
 		errno = 0;
 		long int tempInt = strtol(lexem->getStr(), NULL, 10);
-		if (errno == ERANGE) {
-			throw std::runtime_error("Integer conversion is outside a function's range. Overflow");
-		} else if ((tempInt < INT_MIN) || (tempInt > INT_MAX)) {
-			throw std::runtime_error("Integer overflow");
+		if (errno == ERANGE || (tempInt < INT_MIN) || (tempInt > INT_MAX)) {
+			currentToken = new BaseToken(TokenError, currentTokenInfo, lexem); //replace with tokens, that report proper error, if needed
+		} else {
+			currentToken = new BaseToken(tokenType, currentTokenInfo, lexem);
 		}
-		currentToken = new BaseToken(tokenType, currentTokenInfo, lexem);
 	} else {
 		if (tokenType == TokenEOF) {
 				finished = true;

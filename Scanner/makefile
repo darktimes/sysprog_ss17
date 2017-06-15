@@ -36,7 +36,7 @@ CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_DIR)/$(HEADERDIR) -I$(AU
 CPPFLAGS=-I$(HEADERDIR) 
 
 makeTestScanner: ScannerTarget BaseTokenTarget TestScannerTarget SymbolTokenTarget
-	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o $(SHARED_DIR)/$(OBJDIR)/*.o $(AUTOMAT_DIR)/$(OBJDIR)/*.o $(BUFFER_DIR)/$(OBJDIR)/*.o $(SYMTABLE_DIR)/$(OBJDIR)/*.o -o $(BINDIRTEST)/ScannerTest
+	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o $(SHARED_DIR)/$(OBJDIR)/*.o $(AUTOMAT_DIR)/$(OBJDIR)/*.o $(BUFFER_DIR)/$(OBJDIR)/*.o $(SYMTABLE_DIR)/$(OBJDIR)/*.o -o $(BINDIRTEST)/Scanner
 
 ScannerTarget :  $(SRCDIR)/Scanner.cpp 
 	g++ $(CFLAGS) $(SRCDIR)/Scanner.cpp -o $(OBJDIR)/Scanner.o

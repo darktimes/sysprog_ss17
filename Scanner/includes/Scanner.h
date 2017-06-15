@@ -12,6 +12,8 @@
 
 class Scanner: public IScanner {
 public:
+	static const int TOKEN_MAX_LENGTH;
+
 	Scanner(const char* filepath, SymbolTable *symtab);
 	virtual ~Scanner();
 
@@ -28,8 +30,6 @@ private:
 	bool isScanningToken;
 	bool finished;
 	TokenInfo* currentTokenInfo;
-
-
-
+	unsigned int currentTokenLength;
 };
 

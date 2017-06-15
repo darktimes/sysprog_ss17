@@ -8,7 +8,6 @@
 #pragma once
 
 typedef enum e_TokenType {
-	Initialized,		// default value to initialize with
 	TokenUnknown,		// automat returns this when symbol (lexem) doesn't belong to language
 	TokenIdentifier,	// letter (letter | digit)*
 	TokenInteger,		// digit digit*
@@ -35,7 +34,8 @@ typedef enum e_TokenType {
 	TokenComment,		// used by scanner to skip comments and set start position of next Token accordingly
 	TokenEOF,		  	// returns at the end of the sequence
 	TokenSeparator,		// whitespace, \n
-	TokenLengthExceeded	// if token was too long
+	TokenLengthExceeded,	// if token was too long
+	TokenError
 } TokenType;
 
 const char* tokenToString(TokenType type);

@@ -1,6 +1,6 @@
 #include "Buffer.h"
 
-const unsigned int Buffer::BLOCK_SIZE = 6;
+const unsigned int Buffer::BLOCK_SIZE = 256;
 const unsigned int Buffer::MAX_STEPBACK = Buffer::BLOCK_SIZE / 2;
 
 
