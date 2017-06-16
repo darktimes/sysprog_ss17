@@ -3,12 +3,10 @@
 #include "IScanner.h"
 #include "SymbolTable.h"
 #include "Automat.h"
-#include "BaseToken.h"
-//#include "IntegerToken.h"
-#include "SymbolToken.h"
 //#include "ErrorToken.h"
 #include "TokenType.h"
 #include "Buffer.h"
+#include "Tokens.h"
 
 class Scanner: public IScanner {
 public:
@@ -17,13 +15,15 @@ public:
 	Scanner(const char* filepath, SymbolTable *symtab);
 	virtual ~Scanner();
 
-	BaseToken *nextToken(void);
+	Token *nextToken(void);
 	void mkToken(TokenType tokenType, String* lexem);
 	void ungetChar(int number);
-	BaseToken *currentToken;
+	Token *currentToken;
 
 
 private:
+	int currentLine;
+	int currentColumn;
 	Buffer *buffer;
 	Automat *automat;
 	SymbolTable *symtab;
@@ -31,5 +31,7 @@ private:
 	bool finished;
 	TokenInfo* currentTokenInfo;
 	unsigned int currentTokenLength;
+
+	void adjustIndicies(String* lexem);
 };
 

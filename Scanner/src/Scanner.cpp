@@ -21,7 +21,8 @@ Scanner::Scanner(const char* filepath, SymbolTable* symtab) {
 	if (buffer->isNoFile()) {
 		std::cout<<"There was an error opening the file."<<std::endl;
 	}
-
+	currentLine = 1;
+	currentColumn = 1;
 }
 
 Scanner::~Scanner() {
@@ -29,7 +30,7 @@ Scanner::~Scanner() {
 	delete automat;
 }
 
-BaseToken *Scanner::nextToken() {
+Token *Scanner::nextToken() {
 	currentToken = nullptr;
 	currentTokenInfo = nullptr;
 	currentTokenLength = 0;
@@ -39,40 +40,58 @@ BaseToken *Scanner::nextToken() {
 	}
 	isScanningToken = true;
 
-	this->currentTokenInfo = new TokenInfo(buffer->getCurrentLine(), buffer->getCurrentPos());
+	this->currentTokenInfo = new TokenInfo(currentLine, currentColumn);
 
 	while (isScanningToken) {
-		automat->process(buffer->getChar());
+		char c = buffer->getChar();
+		automat->process(c);
 		currentTokenLength++;
 	}
 	return currentToken;
 }
 
 void Scanner::mkToken(TokenType tokenType, String* lexem) {
+
 	isScanningToken = false;
 	if (currentTokenLength >= TOKEN_MAX_LENGTH) {
-		currentToken = new BaseToken(TokenLengthExceeded, currentTokenInfo, lexem);
+		currentToken = new ErrorToken(tokenType, currentTokenInfo, new String("Token length exceeded"));
 	} else if (tokenType == TokenIdentifier) {
-		currentToken = new SymbolToken(tokenType, currentTokenInfo, symtab->create(*lexem));
+		currentToken = new LexemToken(tokenType, currentTokenInfo, lexem, symtab->create(*lexem));
 	} else if (tokenType == TokenInteger) {
 		errno = 0;
 		long int tempInt = strtol(lexem->getStr(), NULL, 10);
 		if (errno == ERANGE || (tempInt < INT_MIN) || (tempInt > INT_MAX)) {
-			currentToken = new BaseToken(TokenError, currentTokenInfo, lexem); //replace with tokens, that report proper error, if needed
+			currentToken = new ErrorToken(tokenType, currentTokenInfo, new String("Integer value out of range.")); //replace with tokens, that report proper error, if needed
 		} else {
-			currentToken = new BaseToken(tokenType, currentTokenInfo, lexem);
+			currentToken = new IntegerToken(tokenType, currentTokenInfo, (int)tempInt);
 		}
+	} else if (tokenType == TokenUnknown) {
+		currentToken = new UnknownToken(tokenType, currentTokenInfo, *lexem[0]);
 	} else {
 		if (tokenType == TokenEOF) {
 				finished = true;
 			}
-		currentToken = new BaseToken(tokenType, currentTokenInfo, lexem);
+		currentToken = new Token(tokenType, currentTokenInfo);
 	}
-
+	adjustIndicies(lexem);
+	currentTokenInfo = nullptr;
 }
 
 void Scanner::ungetChar(int number) {
+
 	buffer->ungetChar(number);
+}
+
+void Scanner::adjustIndicies(String* lexem) {
+
+	for (int i = 0; i < lexem->getSize() - 1; i++) {
+		if ((*lexem)[i] == '\n') {
+			currentLine++;
+			currentColumn = 1;
+		} else {
+			currentColumn++;
+		}
+	}
 }
 
 

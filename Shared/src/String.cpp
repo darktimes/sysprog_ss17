@@ -7,6 +7,19 @@ String::String() {
 	str[0] = '\0';
 }
 
+String::String(int value) {
+	String reversed_str = String();
+	for (int x = value; x != 0; x /= 10) {
+		reversed_str+= (char) ((x % 10) + 48);
+	}
+	this->size = reversed_str.size;
+	this->str = new char[size];
+	for (int l = size - 2; l >= 0; l--) {
+		str[size - 2 - l] = reversed_str[l];
+	}
+	str[size - 1] = '\0';
+}
+
 String::String(char c) {
 	size = 2;
 	str = new char[2];

@@ -35,17 +35,15 @@ CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_DIR)/$(HEADERDIR) -I$(AU
 
 CPPFLAGS=-I$(HEADERDIR) 
 
-makeTestScanner: ScannerTarget BaseTokenTarget TestScannerTarget SymbolTokenTarget
+makeTestScanner: ScannerTarget TokensTarget TestScannerTarget
 	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o $(SHARED_DIR)/$(OBJDIR)/*.o $(AUTOMAT_DIR)/$(OBJDIR)/*.o $(BUFFER_DIR)/$(OBJDIR)/*.o $(SYMTABLE_DIR)/$(OBJDIR)/*.o -o $(BINDIRTEST)/Scanner
 
 ScannerTarget :  $(SRCDIR)/Scanner.cpp 
 	g++ $(CFLAGS) $(SRCDIR)/Scanner.cpp -o $(OBJDIR)/Scanner.o
 
-SymbolTokenTarget : $(SRCDIR)/SymbolToken.cpp
-	g++ $(CFLAGS) $(SRCDIR)/SymbolToken.cpp -o $(OBJDIR)/SymbolToken.o
 
-BaseTokenTarget : $(SRCDIR)/BaseToken.cpp
-	g++ $(CFLAGS) $(SRCDIR)/BaseToken.cpp -o $(OBJDIR)/BaseToken.o
+TokensTarget : $(SRCDIR)/Tokens.cpp
+	g++ $(CFLAGS) $(SRCDIR)/Tokens.cpp -o $(OBJDIR)/Tokens.o
 
 TestScannerTarget :  $(SRCDIR)/TestScanner.cpp
 	g++ $(CFLAGS) $(SRCDIR)/TestScanner.cpp  -o $(BINDIRTEST)/TestScanner.o
