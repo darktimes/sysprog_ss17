@@ -29,7 +29,7 @@ private:
 	SymbolTable *symtab;
 	bool isScanningToken;
 	bool finished;
-	TokenInfo* currentTokenInfo;
+//	TokenInfo* currentTokenInfo;
 	unsigned int currentTokenLength;
 
 	void adjustIndicies(String* lexem);

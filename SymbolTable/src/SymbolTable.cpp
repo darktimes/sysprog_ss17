@@ -1,9 +1,6 @@
-#include "String.h"
 #include "SymbolTable.h"
 #include <stdlib.h>
-
-SymbolTable::SymbolTable() :
-		tableSize(64), existingElements(0), data(new Symbol*[tableSize]) {
+SymbolTable::SymbolTable() :tableSize(64), existingElements(0), data(new Symbol*[tableSize]) {
 	data = (Symbol**) malloc(sizeof(Symbol*) * tableSize);
 }
 
@@ -16,14 +13,14 @@ SymbolTable::~SymbolTable() {
 	delete[] data;
 }
 
-Symbol* SymbolTable::create(String str) {
+Symbol* SymbolTable::create(String str, TokenType tokenType) {
 	if (isFull())
 		resize();
 
 	unsigned i = indexOf(str);
 
 	if (data[i] == nullptr) {
-		Symbol *sym = new Symbol(str);
+		Symbol *sym = new Symbol(str, tokenType);
 		data[i] = sym;
 		existingElements++;
 		return sym;
@@ -34,7 +31,7 @@ Symbol* SymbolTable::create(String str) {
 unsigned SymbolTable::indexOf(const String str) {
 	unsigned long h = strhash(str);
 	unsigned i = 0;
-	while (data[h] != nullptr && data[h]->ident2.compare(str) != 0)
+	while (data[h] != nullptr && data[h]->ident.compare(str) != 0)
 		h = strhash(str, i++);
 	return h;
 }
@@ -49,10 +46,10 @@ unsigned long SymbolTable::strhash(const String str, const unsigned offset) {
 	return hash % tableSize;
 }
 /**
- * falls >75% voll -> true
+ * falls >50% voll -> true
  */
 bool SymbolTable::isFull() {
-	return existingElements >= tableSize * 0.75;
+	return existingElements >= tableSize * 0.50;
 }
 
 /**
@@ -74,12 +71,13 @@ void SymbolTable::resize() {
 }
 
 void SymbolTable::resizeCreate(Symbol *sym) {
-	unsigned i = indexOf(sym->ident2);
+	unsigned i = indexOf(sym->ident);
 	data[i] = sym;
 }
 
-Symbol::Symbol(String str) {
-	this->ident2 = String(str);
+Symbol::Symbol(String str, TokenType tokenType) {
+	this->ident = String(str);
+	this->tokenType = tokenType;
 }
 
 Symbol::~Symbol() {

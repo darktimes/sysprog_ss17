@@ -16,7 +16,7 @@ Scanner::Scanner(const char* filepath, SymbolTable* symtab) {
 	this->currentToken = nullptr;
 	this->isScanningToken= false;
 	this->finished = false;
-	this->currentTokenInfo = nullptr;
+//	this->currentTokenInfo = nullptr;
 	this->currentTokenLength = 0;
 	if (buffer->isNoFile()) {
 		std::cout<<"There was an error opening the file."<<std::endl;
@@ -32,7 +32,7 @@ Scanner::~Scanner() {
 
 Token *Scanner::nextToken() {
 	currentToken = nullptr;
-	currentTokenInfo = nullptr;
+//	currentTokenInfo = nullptr;
 	currentTokenLength = 0;
 
 	if (finished || buffer->isNoFile()) {
@@ -40,7 +40,7 @@ Token *Scanner::nextToken() {
 	}
 	isScanningToken = true;
 
-	this->currentTokenInfo = new TokenInfo(currentLine, currentColumn);
+//	this->currentTokenInfo = new TokenInfo(currentLine, currentColumn);
 
 	while (isScanningToken) {
 		char c = buffer->getChar();
@@ -51,12 +51,12 @@ Token *Scanner::nextToken() {
 }
 
 void Scanner::mkToken(TokenType tokenType, String* lexem) {
-
+	TokenInfo* currentTokenInfo = new TokenInfo(currentLine, currentColumn);
 	isScanningToken = false;
 	if (currentTokenLength >= TOKEN_MAX_LENGTH) {
 		currentToken = new ErrorToken(tokenType, currentTokenInfo, new String("Token length exceeded"));
 	} else if (tokenType == TokenIdentifier) {
-		currentToken = new LexemToken(tokenType, currentTokenInfo, lexem, symtab->create(*lexem));
+		currentToken = new LexemToken(tokenType, currentTokenInfo, lexem, symtab->create(*lexem, tokenType));
 	} else if (tokenType == TokenInteger) {
 		errno = 0;
 		long int tempInt = strtol(lexem->getStr(), NULL, 10);
@@ -74,7 +74,6 @@ void Scanner::mkToken(TokenType tokenType, String* lexem) {
 		currentToken = new Token(tokenType, currentTokenInfo);
 	}
 	adjustIndicies(lexem);
-	currentTokenInfo = nullptr;
 }
 
 void Scanner::ungetChar(int number) {

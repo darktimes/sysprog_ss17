@@ -5,12 +5,12 @@
 String formatTokenOutput(Token* token) {
 	if (token->tokenType == TokenIdentifier) {
 		return String("Lexem: ") + *(static_cast<LexemToken*>(token))->lexem;
+	} else if (ErrorToken* err_token = dynamic_cast<ErrorToken*>(token)){
+		return String("Error: ") + String(*err_token->err_msg);
 	} else if (token->tokenType == TokenInteger) {
 		return String("Value: ") + String((static_cast<IntegerToken*>(token))->value);
 	} else if (token->tokenType == TokenUnknown) {
 		return String("Char: ") + (static_cast<UnknownToken*>(token))->character;
-	} else if (ErrorToken* err_token = dynamic_cast<ErrorToken*>(token)){
-		return String("Error: ") + String(*err_token->err_msg);
 	} else {
 		return String();
 	}
@@ -22,8 +22,12 @@ int main(int argc, char **argv) {
 		std::cout<<"No file to test provided. Exiting..."<<std::endl;
 		return -1;
 	}
-
+	std::cout<<"Processing..."<<std::endl;
 	SymbolTable* symTable = new SymbolTable();
+	symTable->create(String("while"), TokenWhile);
+	symTable->create(String("WHILE"), TokenWhile);
+	symTable->create(String("if"), TokenIf);
+	symTable->create(String("IF"), TokenIf);
 	Scanner* scanner = new Scanner(argv[1], symTable);
 	std::ofstream outputStream;
 	String outputFileName = String("output-") + String(argv[1]);
@@ -32,19 +36,29 @@ int main(int argc, char **argv) {
 	Token* currentToken;
 	while ((currentToken = scanner->nextToken())) {
 		String str = tokenToString(currentToken->tokenType);
+
+
+		if (ErrorToken* err_token = dynamic_cast<ErrorToken*>(currentToken))  {
+			fprintf(stderr, "Token %s, line: %d, column: %d, error: %s \n",
+					tokenToString(err_token->tokenType),
+					err_token->tokenInfo->line, err_token->tokenInfo->col,
+					(dynamic_cast<ErrorToken*>(err_token)->err_msg->getStr()));
+
+		} else if (currentToken->tokenType == TokenUnknown) {
+			fprintf(stderr, "Token %s, line: %d, column: %d, char: %c \n",
+								tokenToString(currentToken->tokenType),
+								currentToken->tokenInfo->line, currentToken->tokenInfo->col,
+								(static_cast<UnknownToken*>(currentToken))->character);
+		}
 		outputStream<<"Token "<<tokenToString(currentToken->tokenType)<<'\t';
 		if (str.getSize() < 11) {
 			outputStream<<'\t';
 		}
 		outputStream<<"Line: "<<currentToken->tokenInfo->line<<'\t'<<'\t'<<"Column: "<<currentToken->tokenInfo->col<<'\t'<<'\t';
 		outputStream<<formatTokenOutput(currentToken)<<std::endl;
-//		String lexem = (scanner->currentToken->lexem->getSize() <= 2) ? String(wrapChar(*scanner->currentToken->lexem[0])) : *scanner->currentToken->lexem;
-//		outputStream<<"TokenType:"<<tokenToString(scanner->currentToken->tokenType)<<", "<<'\t'<<'\t'<<'\t'<<"lexem: ";
-//		outputStream<<lexem;
-//		outputStream<<'\t'<<'\t'<<"line:"<<scanner->currentToken->tokenInfo->line<<", "<<'\t'<< "pos:"<<'\t'<<scanner->currentToken->tokenInfo->pos<<std::endl;
-
 	}
 	outputStream.close();
+	std::cout<<"Stop."<<std::endl;
 
 
 }

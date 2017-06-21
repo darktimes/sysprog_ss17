@@ -35,7 +35,9 @@ typedef enum e_TokenType {
 	TokenEOF,		  	// returns at the end of the sequence
 	TokenSeparator,		// whitespace, \n
 	TokenLengthExceeded,	// if token was too long
-	TokenError
+	TokenError,
+	TokenRead,
+	TokenWrite
 } TokenType;
 
 const char* tokenToString(TokenType type);

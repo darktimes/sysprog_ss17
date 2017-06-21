@@ -1,12 +1,13 @@
 #pragma once
 
 #include "String.h"
-
+#include "TokenType.h"
 class Symbol final {
 public:
-	Symbol(String ident2);
+	Symbol(String ident, TokenType tokenType);
 	~Symbol();
-	String ident2;
+	String ident;
+	TokenType tokenType;
 
 private:
 };
@@ -16,7 +17,7 @@ public:
 	SymbolTable();
 	~SymbolTable();
 	//Create if non-existent or return already existing
-	Symbol* create(String str);
+	Symbol* create(String str, TokenType tokenType);
 
 private:
 	unsigned tableSize;
