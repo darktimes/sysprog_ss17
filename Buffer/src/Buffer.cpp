@@ -80,18 +80,11 @@ void Buffer::ungetChar(unsigned int ungetCount)
     if (ungetCount <=  currentCharIndex) {
         currentCharIndex -= ungetCount;
     } else {
-//        if (currentBufferBlock->getPrevious()) {
-//
-//        }
-//        else {
-//            throw std::runtime_error("Trying to access non-existent content.");
-//        }
     	unsigned int diff = ungetCount - currentCharIndex;
 		currentBufferBlock = currentBufferBlock->getPrevious();
 		currentBlockIndex--;
 		currentCharIndex = Buffer::BLOCK_SIZE - diff;
     }
-        
 }
 
 unsigned int Buffer::getCurrentLine() {
@@ -100,37 +93,6 @@ unsigned int Buffer::getCurrentLine() {
 
 unsigned int Buffer::getCurrentPos() {
 	return currentCharIndex;
-}
-
-void Buffer::adjustIndiciesIn(int steps) {
-	if (steps == 1) {
-		if (currentCharIndex == Buffer::BLOCK_SIZE - 1) {
-			currentCharIndex = 0;
-			currentBlockIndex++;
-		} else {
-			currentCharIndex++;
-		}
-	} else if (steps < 0) {
-		unsigned int steps_abs = (unsigned int)steps;
-		if (steps_abs <= Buffer::MAX_STEPBACK) {
-			if (currentCharIndex > steps_abs) {
-				currentCharIndex-= steps_abs;
-			} else {
-
-				if (currentBlockIndex != 0) {
-					currentCharIndex = Buffer::BLOCK_SIZE - (steps_abs - currentCharIndex);
-					currentBlockIndex--;
-				} else {
-					currentCharIndex = 0;
-				}
-
-			}
-		} else {
-			throw std::invalid_argument("Offset can be either 1 or in range MAX_STEPBACK...0");
-		}
-	} else {
-		throw std::invalid_argument("Offset can be either 1 or in range MAX_STEPBACK...0");
-	}
 }
 
 bool Buffer::isEOF() {

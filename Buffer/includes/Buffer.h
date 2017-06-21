@@ -31,8 +31,6 @@ private:
 	bool noFile;
     FileReader* fileReader;
     BufferBlock* currentBufferBlock;
-    void switchToNextBlock();
-    void adjustIndiciesIn(int steps);
     unsigned int currentCharIndex;
     unsigned int currentBlockIndex;
     unsigned int stepBackAmount;
