@@ -1,14 +1,15 @@
 #include "Parser.h"
+#include "Set.h"
 
 Parser::Parser(const char* file_path) {
 	symbolTable = new SymbolTable();
-	symbolTable->create(String("while"));
-	symbolTable->create(String("WHILE"));
-	symbolTable->create(String("if"));
-	symbolTable->create(String("IF"));
-	symbolTable->create(String("int"));
-	symbolTable->create(String("read("));
-	symbolTable->create(String("write("));
+//	symbolTable->create(String("while"));
+//	symbolTable->create(String("WHILE"));
+//	symbolTable->create(String("if"));
+//	symbolTable->create(String("IF"));
+//	symbolTable->create(String("int"));
+//	symbolTable->create(String("read("));
+//	symbolTable->create(String("write("));
 	scanner = new Scanner(file_path, symbolTable);
 	currentToken = nullptr;
 }
@@ -23,53 +24,23 @@ void Parser::nextToken() {
 }
 
 void Parser::parse() {
-	nextToken();
-	declarations();
-	statements();
-}
-
-void Parser::declarations() {
 
 }
-
-void Parser::declaration() {
-
-}
-
-void Parser::array() {
-
-}
-
-void Parser::statements() {
-
-}
-
-void Parser::statement() {
-
-}
-
-void Parser::exp() {
-
-}
-
-void Parser::exp2() {
-
-}
-
-void Parser::index() {
-
-}
-
-void Parser::op_exp() {
-
-}
-
-void Parser::op() {
-
-}
-
 
 Parser::~Parser() {
 	delete symbolTable;
 	delete scanner;
+}
+
+ParseVisitor::ParseVisitor() {
+
+}
+
+void ParseVisitor::parseNode(Node* node) {
+
+}
+
+int main(int argc, char** args) {
+
+	return 0;
 }

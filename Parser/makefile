@@ -23,6 +23,7 @@ SYMTABLE_DIR = ../SymbolTable
 BUFFER_DIR = ../Buffer
 SHARED_DIR = ../Shared
 AUTOMAT_DIR = ../Automat
+SCANNER_DIR = ../Scanner
 
 #SHARED_SRCDIR = ../Shared/src
 
@@ -31,16 +32,21 @@ OBJDIR = objs
 
 # enthaelt die Objectfiles und das ausfuehrbare File zum Testen des Teilprojekts
 
-CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_DIR)/$(HEADERDIR) -I$(AUTOMAT_DIR)/$(HEADERDIR) -I$(SYMTABLE_DIR)/$(HEADERDIR) -I$(BUFFER_DIR)/$(HEADERDIR)
+CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_DIR)/$(HEADERDIR) -I$(AUTOMAT_DIR)/$(HEADERDIR) -I$(SYMTABLE_DIR)/$(HEADERDIR) -I$(BUFFER_DIR)/$(HEADERDIR) -I$(SCANNER_DIR)/$(HEADERDIR)
 
 CPPFLAGS=-I$(HEADERDIR) 
 
-makeParserExe: ParserTarget
-	g++ -g -std=c++11 $(OBJDIR)/*.o $(BINDIRTEST)/*.o $(SHARED_DIR)/$(OBJDIR)/*.o $(AUTOMAT_DIR)/$(OBJDIR)/*.o $(BUFFER_DIR)/$(OBJDIR)/*.o $(SYMTABLE_DIR)/$(OBJDIR)/*.o -o $(BINDIRTEST)/Parser
+makeParserExe: ParserTarget SetTarget TreeEntitiesTarget
+	g++ -g -std=c++11 $(OBJDIR)/*.o $(SHARED_DIR)/$(OBJDIR)/*.o $(AUTOMAT_DIR)/$(OBJDIR)/*.o $(BUFFER_DIR)/$(OBJDIR)/*.o $(SYMTABLE_DIR)/$(OBJDIR)/*.o $(SCANNER_DIR)/$(OBJDIR)/*.o -o $(BINDIRTEST)/Parser
 
 ParserTarget :  $(SRCDIR)/Parser.cpp 
 	g++ $(CFLAGS) $(SRCDIR)/Parser.cpp -o $(OBJDIR)/Parser.o
 
+SetTarget :  $(SRCDIR)/Set.cpp 
+	g++ $(CFLAGS) $(SRCDIR)/Set.cpp -o $(OBJDIR)/Set.o
+
+TreeEntitiesTarget :  $(SRCDIR)/TreeEntities.cpp 
+	g++ $(CFLAGS) $(SRCDIR)/TreeEntities.cpp -o $(OBJDIR)/TreeEntities.o
 
 #TokensTarget : $(SRCDIR)/Tokens.cpp
 #	g++ $(CFLAGS) $(SRCDIR)/Tokens.cpp -o $(OBJDIR)/Tokens.o

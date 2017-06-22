@@ -2,6 +2,9 @@
 
 #include "Scanner.h"
 #include "SymbolTable.h"
+#include "TreeEntities.h"
+
+class Node;
 
 class Parser{
 
@@ -16,17 +19,11 @@ class Parser{
 		Token* currentToken;
 
 		void nextToken();
+};
 
-		void declarations();
-		void declaration();
-		void array();
-
-		void statements();
-		void statement();
-		void exp();
-		void exp2();
-		void index();
-		void op_exp();
-		void op();
-
+class ParseVisitor {
+public:
+	ParseVisitor();
+	virtual ~ParseVisitor() {}
+	void parseNode(Node* node);
 };

@@ -63,6 +63,12 @@ const char* tokenToString(TokenType type) {
 		return "Separator";
 	case TokenLengthExceeded:
 		return "LengthExceeded";
+	case TokenRead:
+			return "Read";
+	case TokenWrite:
+			return "Write";
+	case TokenElse:
+			return "Else";
 	default: return "error";
 	}
 }
