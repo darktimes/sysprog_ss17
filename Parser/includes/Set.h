@@ -47,8 +47,8 @@ class Set {
 
 		static Set* FirstOf(const Set* const firstSet, const Set* const followSet);
 	private:
-		bool containsEpsilon;
 		unsigned int size;
+		bool containsEpsilon;
 		TokenType* elems;
 		static const Set* const constructFollowIndexSet();
 		static const Set* const constructFirstProgSet();

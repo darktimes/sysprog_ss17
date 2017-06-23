@@ -20,7 +20,7 @@ Parser::Parser(const char* file_path) {
 Token* Parser::nextToken() {
 	Token* result;
 	result = scanner->nextToken();
-	while(result && (result->tokenType==TokenSeparator || result->tokenType == TokenEOF)) {
+	while(result && (result->tokenType==TokenSeparator || result->tokenType == TokenEOF || result->tokenType == TokenComment)) {
 		delete result;
 		result = scanner->nextToken();
 	}
@@ -63,15 +63,15 @@ void ParseVisitor::nextToken() {
 			std::cout<<"Error parsing token: "<<err_token->err_msg<<std::endl;
 			errored = true;
 		}
-//		for (int i = 0; i <v; i++) {
-//			std::cout<<"   ";
-//		}
-//		std::cout<<"current token: "<<tokenToString(currentToken->tokenType)<<std::endl;
+		for (int i = 0; i <v; i++) {
+			std::cout<<"   ";
+		}
+		std::cout<<"current token: "<<tokenToString(currentToken->tokenType)<<std::endl;
 	} else {
-//		for (int i = 0; i <v; i++) {
-//					std::cout<<"   ";
-//				}
-//		std::cout<<"current token: empty"<<std::endl;
+		for (int i = 0; i <v; i++) {
+					std::cout<<"   ";
+				}
+		std::cout<<"current token: empty"<<std::endl;
 	}
 
 }
@@ -193,6 +193,8 @@ void ParseVisitor::parseNode(Node* node) {
 				Node* statementsChild = new Node(NodeStatements);
 				statementsChild->parse(this);
 				node->addChild(statementsChild);
+			} else {
+				printError(String("Expected ';'"));
 			}
 		} else if (!Set::FollowStatements->contains(currentToken)) {
 			printError(String("Unexpected token STATEMENTS"));
@@ -336,13 +338,13 @@ void ParseVisitor::parseNode(Node* node) {
 						statementChild->parse(this);
 						node->addChild(statementChild);
 					} else {
-						printError("Expected ')'");
+						printError(String("Expected ')'"));
 					}
 				} else {
-					printError("Expected '('");
+					printError(String("Expected '('"));
 				}
 			} else {
-				printError("Unexpected token STATEMENT (while)");
+				printError(String("Unexpected token STATEMENT (while)"));
 			}
 		} else {
 			printError(String("Unexpected token STATEMENT"));

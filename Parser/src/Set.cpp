@@ -49,7 +49,7 @@ Set::Set(const TokenType* const elems, unsigned size, bool containsEpsilon): siz
 //	unsigned int i = sizeof(elems) / sizeof(TokenType);
 //	std::cout<<"i"<<i<<std::endl;
 	TokenType* temp_elems = new TokenType[size];
-	int l = 0;
+	unsigned l = 0;
 	for (unsigned int j = 0; j < size; j++) {
 		if (!::contains(temp_elems, size, elems[j])) {
 			temp_elems[l++] = elems[j];
