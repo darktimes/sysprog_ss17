@@ -15,9 +15,9 @@ const char* tokenToString(TokenType type) {
 		return "Identifier";
 	case TokenInteger:
 		return "Integer";
-	case TokenIf:
+	case TokenKeyWordIf:
 		return "If";
-	case TokenWhile:
+	case TokenKeyWordWhile:
 		return "While";
 	case TokenPlus:
 		return "Plus";
@@ -63,12 +63,14 @@ const char* tokenToString(TokenType type) {
 		return "Separator";
 	case TokenLengthExceeded:
 		return "LengthExceeded";
-	case TokenRead:
+	case TokenKeyWordRead:
 			return "Read";
-	case TokenWrite:
+	case TokenKeyWordWrite:
 			return "Write";
-	case TokenElse:
+	case TokenKeyWordElse:
 			return "Else";
+	case TokenKeyWordInt:
+			return "Int";
 	default: return "error";
 	}
 }

@@ -56,7 +56,13 @@ void Scanner::mkToken(TokenType tokenType, String* lexem) {
 	if (currentTokenLength >= TOKEN_MAX_LENGTH) {
 		currentToken = new ErrorToken(tokenType, currentTokenInfo, new String("Token length exceeded"));
 	} else if (tokenType == TokenIdentifier) {
-		currentToken = new LexemToken(tokenType, currentTokenInfo, lexem, symtab->create(*lexem, tokenType));
+		Symbol* sym = symtab->getSymbolOf(*lexem);
+		if (!sym) {
+			currentToken = new LexemToken(tokenType, currentTokenInfo, lexem, symtab->create(*lexem, tokenType));
+		} else {
+			currentToken = new LexemToken(sym->tokenType, currentTokenInfo, lexem, sym);
+		}
+
 	} else if (tokenType == TokenInteger) {
 		errno = 0;
 		long int tempInt = strtol(lexem->getStr(), NULL, 10);

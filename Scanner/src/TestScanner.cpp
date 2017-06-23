@@ -24,10 +24,10 @@ int main(int argc, char **argv) {
 	}
 	std::cout<<"Processing..."<<std::endl;
 	SymbolTable* symTable = new SymbolTable();
-	symTable->create(String("while"), TokenWhile);
-	symTable->create(String("WHILE"), TokenWhile);
-	symTable->create(String("if"), TokenIf);
-	symTable->create(String("IF"), TokenIf);
+	symTable->create(String("while"), TokenKeyWordWhile);
+	symTable->create(String("WHILE"), TokenKeyWordWhile);
+	symTable->create(String("if"), TokenKeyWordIf);
+	symTable->create(String("IF"), TokenKeyWordIf);
 	Scanner* scanner = new Scanner(argv[1], symTable);
 	std::ofstream outputStream;
 	String outputFileName = String("output-") + String(argv[1]);
