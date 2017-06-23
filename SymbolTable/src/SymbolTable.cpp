@@ -1,40 +1,56 @@
 #include "SymbolTable.h"
 #include <stdlib.h>
-SymbolTable::SymbolTable() :tableSize(64), existingElements(0), data(new Symbol*[tableSize]) {
-	data = (Symbol**) malloc(sizeof(Symbol*) * tableSize);
+SymbolTable::SymbolTable() :tableSize(64), existingElements(0), data(new std::vector<Symbol*>[tableSize]) {
+
 }
 
 SymbolTable::~SymbolTable() {
-	for (unsigned i = 0; i < tableSize; ++i) {
-		Symbol* sym = data[i];
-		if (sym != nullptr)
-			delete sym;
+	for (unsigned i = 0; i < tableSize; i++) {
+
+		for (Symbol* symbol: data[i]) {
+			delete symbol;
+		}
+
 	}
 	delete[] data;
 }
 
 Symbol* SymbolTable::create(String str, TokenType tokenType) {
-	if (isFull())
+	if (needsResize()) {
 		resize();
+	}
+	unsigned i = strhash(str);
 
-	unsigned i = indexOf(str);
 
-	if (data[i] == nullptr) {
-		Symbol *sym = new Symbol(str, tokenType);
-		data[i] = sym;
-		existingElements++;
-		return sym;
-	} else
-		return data[i];
+//	if (data[i] == nullptr) {
+//		data[i] = std::vector<Symbol*>();
+	for (Symbol* symbol: data[i]) {
+				if (symbol->ident.compare(str)) {
+					return symbol;
+				}
+			}
+	Symbol* result = new Symbol(str, tokenType);
+	data[i].push_back(result);
+	existingElements++;
+	return result;
+//	} else {
+
+//		existingElements++;
+//		Symbol* result = new Symbol(str, tokenType);
+//		data[i].push_back(result);
+//		return result;
+//	}
 }
 
-unsigned SymbolTable::indexOf(const String str) {
-	unsigned long h = strhash(str);
-	unsigned i = 0;
-	while (data[h] != nullptr && data[h]->ident.compare(str) != 0)
-		h = strhash(str, i++);
-	return h;
+Symbol* SymbolTable::getSymbolOf(String str) {
+	for (Symbol* symbol: data[strhash(str)]) {
+		if (symbol->ident.compare(str)) {
+			return symbol;
+		}
+	}
+	return nullptr;
 }
+
 /**
  * djb2 algorithm k = 33
  */
@@ -48,7 +64,7 @@ unsigned long SymbolTable::strhash(const String str, const unsigned offset) {
 /**
  * falls >50% voll -> true
  */
-bool SymbolTable::isFull() {
+bool SymbolTable::needsResize() {
 	return existingElements >= tableSize * 0.50;
 }
 
@@ -56,23 +72,17 @@ bool SymbolTable::isFull() {
  * neue Table doppelt so gross machen, alte copieren und loeschen
  */
 void SymbolTable::resize() {
-	Symbol** oldData = data;
-	unsigned oldSize = tableSize;
+	std::vector<Symbol*>* old = data;
+	unsigned oldsize = tableSize;
 	tableSize *= 2;
-	data = new Symbol*[tableSize];
-	data = (Symbol**) malloc(sizeof(Symbol*) * tableSize);
+	data = new std::vector<Symbol*>[tableSize];
 
-	for (unsigned i = 0; i < oldSize; ++i) {
-		Symbol* sym = oldData[i];
-		if (sym != nullptr)
-			resizeCreate(sym);
+	for (unsigned i = 0; i < oldsize; i++) {
+		for (Symbol* symbol : old[i]) {
+			int j = strhash(symbol->ident);
+			data[j].push_back(symbol);
+		}
 	}
-	delete[] oldData;
-}
-
-void SymbolTable::resizeCreate(Symbol *sym) {
-	unsigned i = indexOf(sym->ident);
-	data[i] = sym;
 }
 
 Symbol::Symbol(String str, TokenType tokenType) {

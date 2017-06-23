@@ -52,7 +52,7 @@ TreeEntitiesTarget :  $(SRCDIR)/TreeEntities.cpp
 #	g++ $(CFLAGS) $(SRCDIR)/Tokens.cpp -o $(OBJDIR)/Tokens.o
 
 
-cleanScanner:
+cleanParser:
 	rm -f objs/*.o
 	rm -f debug/*
 	
