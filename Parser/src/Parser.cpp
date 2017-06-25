@@ -449,12 +449,6 @@ void ParseVisitor::parseNode(Node* node) {
 			printParseError(String("Unexpected token in OP"));
 		}
 	}
-//	v--;
-//	for (int e = 0; e < v; e++) {
-//		std::cout<<"   ";
-//	}
-//
-//	std::cout<<'\\'<<nodeToString(node->getNodeType())<<std::endl;
 
 }
 
@@ -466,9 +460,7 @@ void ParseVisitor::checkNode(Node* node) {
 			Node* current = node->getChildren()->at(i);
 			current->checkType(this);
 		}
-	}
-
-	else if (node->getNodeType() == NodeDecls) {
+	} else if (node->getNodeType() == NodeDecls) {
 		node->type = NoType;
 		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
 			Node* current = node->getChildren()->at(i);
@@ -678,7 +670,7 @@ int main(int argc, char **argv) {
 	if (argc < 2) {
 		std::cout<<"No file specified  to work with. Exiting..."<<std::endl;
 		return -1;
-	} else if (argc > 2){
+	} else if (argc > 2) {
 		std::cout<<"Warning. Too much arguments. Arguments after 2nd one will be ignored"<<std::endl;
 	}
 
