@@ -23,6 +23,7 @@ SYMTABLE_DIR = ../SymbolTable
 BUFFER_DIR = ../Buffer
 SHARED_DIR = ../Shared
 AUTOMAT_DIR = ../Automat
+PARSER_DIR = ../Parser
 
 #SHARED_SRCDIR = ../Shared/src
 
@@ -31,7 +32,7 @@ OBJDIR = objs
 
 # enthaelt die Objectfiles und das ausfuehrbare File zum Testen des Teilprojekts
 
-CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_DIR)/$(HEADERDIR) -I$(AUTOMAT_DIR)/$(HEADERDIR) -I$(SYMTABLE_DIR)/$(HEADERDIR) -I$(BUFFER_DIR)/$(HEADERDIR)
+CFLAGS=-g -c -Wall -std=c++11 -I$(HEADERDIR) -I$(SHARED_DIR)/$(HEADERDIR) -I$(AUTOMAT_DIR)/$(HEADERDIR) -I$(SYMTABLE_DIR)/$(HEADERDIR) -I$(BUFFER_DIR)/$(HEADERDIR) -I$(PARSER_DIR)/$(HEADERDIR)
 
 CPPFLAGS=-I$(HEADERDIR) 
 

@@ -19,7 +19,7 @@ Scanner::Scanner(const char* filepath, SymbolTable* symtab) {
 //	this->currentTokenInfo = nullptr;
 	this->currentTokenLength = 0;
 	if (buffer->isNoFile()) {
-		std::cout<<"There was an error opening the file."<<std::endl;
+		finished = true;
 	}
 	currentLine = 1;
 	currentColumn = 1;
@@ -99,4 +99,7 @@ void Scanner::adjustIndicies(String* lexem) {
 	}
 }
 
+bool Scanner::isFinished() const {
+	return finished;
+}
 
