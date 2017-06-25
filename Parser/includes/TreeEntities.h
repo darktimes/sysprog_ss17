@@ -52,7 +52,7 @@ class Leaf {
 		Leaf(Token* token);
 		virtual ~Leaf();
 	private:
-		Token token;
+		Token* token;
 };
 
 class Node {

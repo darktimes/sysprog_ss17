@@ -46,16 +46,16 @@ Node::~Node() {
 	delete leafs;
 }
 
-Leaf::Leaf(Token* token): token(*token) {
+Leaf::Leaf(Token* token): token(token) {
 
 }
 
 Token* Leaf::getToken() {
-	return &token;
+	return token;
 }
 
 Leaf::~Leaf() {
-	std::cout<<"leaf deleted: "<<tokenToString(token.tokenType)<<std::endl;
+	std::cout<<"leaf deleted: "<<tokenToString(token->tokenType)<<std::endl;
 }
 
 
