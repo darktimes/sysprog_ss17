@@ -25,6 +25,7 @@ class ParseVisitor {
 		virtual ~ParseVisitor() {}
 		void parseNode(Node* node);
 		void checkNode(Node* node);
+		void makeNode(Node* node);
 		bool isErrored() const;
 		void nextToken();
 		void printParseError(String msg);
@@ -45,6 +46,7 @@ class Parser: ITokenGenerator{
 		virtual ~Parser();
 		void parse();
 		void typeCheck();
+		void makeCode();
 		bool isFinished() const;
 		Token* nextToken() override;
 		bool isErrored() const;

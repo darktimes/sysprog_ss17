@@ -60,6 +60,7 @@ class Node {
 		Node(NodeType nodeType);
 		void parse(ParseVisitor* parseVisitor);
 		void checkType(ParseVisitor* parseVisitor);
+		void makeCode(ParseVisitor* parseVisitor);
 		void addChild(Node* child);
 		void addLeaf(Leaf* child);
 		NodeType getNodeType() const;
