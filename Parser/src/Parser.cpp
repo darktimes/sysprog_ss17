@@ -658,27 +658,43 @@ void ParseVisitor::checkNode(Node* node) {
 //TODO makeNode
 void ParseVisitor::makeNode(Node* node) {
 	if (node->getNodeType() == NodeProg) {
-		if (node->getChildren()->getLength() > 1) {
-			node->getChildren()->at(0)->makeCode(this); //DECLS
-			node->getChildren()->at(1)->makeCode(this); //STATEMENTS
-			std::cout << "STP" << std::endl;
-		}
+		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
+					Node* current = node->getChildren()->at(i);
+					current->makeCode(this);
+				}
+		std::cout << "STP" << std::endl;
+//		if (node->getChildren()->getLength() > 1) {
+//			node->getChildren()->at(0)->makeCode(this); //DECLS
+//			node->getChildren()->at(1)->makeCode(this); //STATEMENTS
+//			std::cout << node->getChildren()->at(0)->getNodeType() << std::endl;
+//			std::cout << "STP" << std::endl;
+//		}
 	}
 
 	else if (node->getNodeType() == NodeDecls) {
-		if (node->getChildren()->getLength() > 1) {
-			node->getChildren()->at(0)->makeCode(this); //DECL
-			node->getChildren()->at(1)->makeCode(this); //DECLS
-		}
+		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
+					Node* current = node->getChildren()->at(i);
+					current->makeCode(this);
+				}
+
+//		if (node->getChildren()->getLength() > 1) {
+//			node->getChildren()->at(0)->makeCode(this); //DECL
+//			node->getChildren()->at(1)->makeCode(this); //DECLS
+//		}
 
 		//TODO epsilon
 
 	} else if (node->getNodeType() == NodeDecl) {
-		Token* token = node->getLeafs()->at(1)->getToken();
-		std::cout << "DS " << " $" << tokenToString(token->tokenType) << " ";
+
+		if (node->getLeafs()->getLength() > 1) {
+			Token* token = node->getLeafs()->at(1)->getToken();
+					std::cout << "DS " << " $" << tokenToString(token->tokenType) << " ";
+		}
+
 		Node* arrayNode = node->getChildren()->at(0);
 		arrayNode->makeCode(this); //ARRAY
 	} else if (node->getNodeType() == NodeArray) {
+		std::cout << "hello array" << std::endl;
 		if (node->getLeafs()->getLength() != 0) {
 			Leaf* leaf = node->getLeafs()->at(1);
 			std::cout << static_cast<IntegerToken*>(leaf->getToken())->value << std::endl;
@@ -686,13 +702,19 @@ void ParseVisitor::makeNode(Node* node) {
 			std::cout << 1 << std::endl;
 		}
 	} else if (node->getNodeType() == NodeStatements){
-		if (node->getLeafs()->getLength() != 0) {
-			node->getChildren()->at(0)->makeCode(this); //STATEMENT
-			node->getChildren()->at(1)->makeCode(this); //STATEMENTS
 
-		} else {
-			std::cout << "NOP" << std::endl;
+		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
+			node->getChildren()->at(i)->makeCode(this);
 		}
+
+		std::cout << "NOP" << std::endl;
+//		if (node->getLeafs()->getLength() != 0) {
+//			node->getChildren()->at(0)->makeCode(this); //STATEMENT
+//			node->getChildren()->at(1)->makeCode(this); //STATEMENTS
+//
+//		} else {
+//			std::cout << "NOP" << std::endl;
+//		}
 
 		//TODO epsilon
 	} else if (node->getNodeType() == NodeStatement) {
@@ -779,7 +801,7 @@ void ParseVisitor::makeNode(Node* node) {
 		//TODO epsilon
 
 	} else if (node->getNodeType() == NodeOp) {
-			switch (node->getLeafs()->at(0)->getToken()->tokenType) {
+		switch (node->getLeafs()->at(0)->getToken()->tokenType) {
 			case TokenPlus: std::cout << "ADD " << std::endl; break;
 			case TokenMinus: std::cout << "SUB " << std::endl; break;
 			case TokenAsterisk: std::cout << "MUL " << std::endl; break;
