@@ -16,6 +16,10 @@ void Node::checkType(ParseVisitor* parseVisitor) {
 	parseVisitor->checkNode(this);
 }
 
+void Node::makeCode(ParseVisitor* parseVisitor) {
+	parseVisitor->makeNode(this);
+}
+
 void Node::addChild(Node* child) {
 	children->pushBack(child);
 }

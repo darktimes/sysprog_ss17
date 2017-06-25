@@ -49,6 +49,10 @@ void Parser::typeCheck() {
 //	}
 }
 
+void Parser::makeCode() {
+	parseVisitor.makeNode(root);
+}
+
 Parser::~Parser() {
 	delete root;
 }
@@ -651,6 +655,148 @@ void ParseVisitor::checkNode(Node* node) {
 	std::cout<<"Exiting..."<<nodeToString(node->getNodeType())<<std::endl;
 }
 
+//TODO makeNode
+void ParseVisitor::makeNode(Node* node) {
+	if (node->getNodeType() == NodeProg) {
+		if (node->getChildren()->getLength() > 1) {
+			node->getChildren()->at(0)->makeCode(this); //DECLS
+			node->getChildren()->at(1)->makeCode(this); //STATEMENTS
+			std::cout << "STP" << std::endl;
+		}
+	}
+
+	else if (node->getNodeType() == NodeDecls) {
+		if (node->getChildren()->getLength() > 1) {
+			node->getChildren()->at(0)->makeCode(this); //DECL
+			node->getChildren()->at(1)->makeCode(this); //DECLS
+		}
+
+		//TODO epsilon
+
+	} else if (node->getNodeType() == NodeDecl) {
+		Token* token = node->getLeafs()->at(1)->getToken();
+		std::cout << "DS " << " $" << tokenToString(token->tokenType) << " ";
+		Node* arrayNode = node->getChildren()->at(0);
+		arrayNode->makeCode(this); //ARRAY
+	} else if (node->getNodeType() == NodeArray) {
+		if (node->getLeafs()->getLength() != 0) {
+			Leaf* leaf = node->getLeafs()->at(1);
+			std::cout << static_cast<IntegerToken*>(leaf->getToken())->value << std::endl;
+		} else {
+			std::cout << 1 << std::endl;
+		}
+	} else if (node->getNodeType() == NodeStatements){
+		if (node->getLeafs()->getLength() != 0) {
+			node->getChildren()->at(0)->makeCode(this); //STATEMENT
+			node->getChildren()->at(1)->makeCode(this); //STATEMENTS
+
+		} else {
+			std::cout << "NOP" << std::endl;
+		}
+
+		//TODO epsilon
+	} else if (node->getNodeType() == NodeStatement) {
+		Leaf* firstLeaf = node->getLeafs()->at(0);
+		Node* firstNode = node->getChildren()->at(0);
+		if (firstLeaf->getToken()->tokenType == TokenIdentifier) {
+			Node* secondNode = node->getChildren()->at(1);
+			secondNode->makeCode(this); //EXP
+			std::cout << "LA " << " $" << tokenToString(firstLeaf->getToken()->tokenType) << " ";
+			firstNode->makeCode(this); //INDEX
+			std::cout << "STR" << std::endl;
+		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordWrite) {
+			firstNode->makeCode(this); //EXP
+			std::cout << "PRI " << std::endl;
+		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordRead) {
+			std::cout << "REA " << std::endl;
+			Leaf* thirdLeaf = node->getLeafs()->at(2);
+			std::cout << "LA " << " $" << tokenToString(thirdLeaf->getToken()->tokenType) << " ";
+			firstNode->makeCode(this); //INDEX
+			std::cout << "STR" << std::endl;
+		} else if (firstLeaf->getToken()->tokenType == TokenBracketOpen2) {
+			firstNode->makeCode(this); //STATEMENTS
+		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordIf) {
+			firstNode->makeCode(this); //EXP
+			std::cout << "JIN " << " # " << "label1" << std::endl;
+			node->getChildren()->at(1)->makeCode(this); //STATEMENT
+			std::cout << "JIN" << " # " << "label2" << std::endl;
+			std::cout << "#" << "label1" << " NOP" << std::endl;
+			node->getChildren()->at(2)->makeCode(this); //STATEMENT
+			std::cout << " # " << " label2 " << " NOP" << std::endl;
+		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordWhile) {
+			std::cout << " # " << " label1 " << "NOP" << std::endl;
+			firstNode->makeCode(this); //EXP
+			std::cout << "JIN " << " # " << " label2" << std::endl;
+			node->getChildren()->at(1)->makeCode(this); //STATEMENT
+			std::cout << "JMP " << " # " << " label1" << std::endl;
+			std::cout << "# " << " label2 " << "NOP" << std::endl;
+		}
+	} else if (node->getNodeType() == NodeIndex) {
+		if (node->getLeafs()->getLength() != 0) {
+			node->getChildren()->at(0)->makeCode(this);
+			std::cout << "ADD " << std::endl;
+		}
+
+		//TODO epsilon
+	} else if (node->getNodeType() == NodeExp) {
+		if (node->getChildren()->at(1)->type == NoType) {
+			node->getChildren()->at(0)->makeCode(this); //EXP2
+		} else if (node->getChildren()->at(1)->type == OpGreater) {
+			node->getChildren()->at(1)->makeCode(this); //OP_EXP
+			node->getChildren()->at(0)->makeCode(this); //EXP2
+			std::cout << "LES" << std::endl;
+		} else if (node->getChildren()->at(1)->type == OpUnequal) {
+			node->getChildren()->at(0)->makeCode(this); //EXP2
+			node->getChildren()->at(1)->makeCode(this); //OP_EXP
+			std::cout << "NOT" << std::endl;
+		}
+	} else if(node->getNodeType() == NodeExp2) {
+		Leaf* firstLeaf = node->getLeafs()->at(0);
+		if (firstLeaf->getToken()->tokenType == TokenBracketOpen1) {
+			node->getChildren()->at(0)->makeCode(this); //EXP
+		} else if (firstLeaf->getToken()->tokenType == TokenIdentifier) {
+			Token* token = node->getLeafs()->at(0)->getToken();
+			std::cout << "LA " << " $" << tokenToString(token->tokenType) << " ";
+			node->getChildren()->at(0)->makeCode(this); //INDEX
+			std::cout << "LV " << std::endl;
+		} else if (firstLeaf->getToken()->tokenType == TokenInteger) {
+			//dynamic_cast<IntegerToken*>(node->getLeafs()->at(0)->getToken())
+			std::cout << "LC " <<  static_cast<IntegerToken*>(node->getLeafs()->at(0)->getToken())->value << std::endl;
+		} else if (firstLeaf->getToken()->tokenType == TokenMinus) {
+			std::cout << "LC " << 0 << std::endl;
+			node->getChildren()->at(0)->makeCode(this); //EXP2
+			std::cout << "SUB " << std::endl;
+		} else if (firstLeaf->getToken()->tokenType == TokenExclamation) {
+			node->getChildren()->at(0)->makeCode(this); //EXP2
+			std::cout << "NOT " << std::endl;
+
+		}
+	} else if (node->getNodeType() == NodeOpExp) {
+		if (node->getLeafs()->getLength() != 0) {
+			node->getChildren()->at(0)->makeCode(this);
+			node->getChildren()->at(1)->makeCode(this);
+		}
+		//TODO epsilon
+
+	} else if (node->getNodeType() == NodeOp) {
+			switch (node->getLeafs()->at(0)->getToken()->tokenType) {
+			case TokenPlus: std::cout << "ADD " << std::endl; break;
+			case TokenMinus: std::cout << "SUB " << std::endl; break;
+			case TokenAsterisk: std::cout << "MUL " << std::endl; break;
+			case TokenColon: std::cout << "DIV " << std::endl; break;
+			case TokenLessThan: std::cout << "LES " << std::endl; break;
+			case TokenGreaterThan: ; break;
+			case TokenAnd: std::cout << "AND " << std::endl; break;
+			case TokenEquals1: std::cout << "EQU " << std::endl; break;
+			case TokenEquals3: std::cout << "EQU " << std::endl; break;
+			default: std::cout << "error NodeOp" << std::endl;break;
+		}
+	}
+	//std::cout<<"Exiting coding..."<<nodeToString(node->getNodeType())<<std::endl;
+}
+
+
+
 bool ParseVisitor::isErrored() const {
 	return errored;
 }
@@ -689,12 +835,16 @@ int main(int argc, char **argv) {
 
 
 
-		parser.typeCheck();
+		//parser.typeCheck();
 		if (parser.isErrored()) {
 			std::cout<<"There were errors, while evaluating types. Aborting..."<<std::endl;
 		} else {
 			std::cout<<"Making code"<<std::endl;
 			//make code
+			parser.makeCode();
+			if (parser.isErrored()) {
+				std::cout << "There were errors, while generating code. Aborting.. " << std::endl;
+			}
 		}
 	}
 	return 0;
