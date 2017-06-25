@@ -50,6 +50,7 @@ void Parser::typeCheck() {
 }
 
 Parser::~Parser() {
+	delete root;
 }
 
 bool Parser::isErrored() const{
