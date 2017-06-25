@@ -19,7 +19,7 @@ public:
 	void mkToken(TokenType tokenType, String* lexem);
 	void ungetChar(int number);
 	Token *currentToken;
-
+	bool isFinished() const;
 
 private:
 	int currentLine;
