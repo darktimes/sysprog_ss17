@@ -705,9 +705,11 @@ void ParseVisitor::makeNode(Node* node) {
 		v++;
 	}
 	if (node->getNodeType() == NodeProg) {
-		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
-			node->getChildren()->at(i)->makeCode(this);
-		}
+//		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
+//			node->getChildren()->at(i)->makeCode(this);
+//		}
+		node->getChildren()->at(0)->makeCode(this); //DECLS
+		node->getChildren()->at(1)->makeCode(this); //STATEMENTS
 		tokenGenerator->getStream() << "STP" << std::endl;
 	} else if (node->getNodeType() == NodeDecls) {
 		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
@@ -819,10 +821,12 @@ void ParseVisitor::makeNode(Node* node) {
 
 		}
 	} else if (node->getNodeType() == NodeOpExp) {
-		for (unsigned i = 0; i < node->getChildren()->getLength();i++) {
-			node->getChildren()->at(i)->makeCode(this);
-		}
-
+//		for (unsigned i = 0; i < node->getChildren()->getLength();i++) {
+//			node->getChildren()->at(i)->makeCode(this);
+//		}
+		node->getChildren()->at(1)->makeCode(this); //EXP -> should be 0 node but is 1
+		node->getChildren()->at(0)->makeCode(this); //OP -> should be 1 node
+		//TODO epsilon
 	} else if (node->getNodeType() == NodeOp) {
 		switch (node->getLeafs()->at(0)->getToken()->tokenType) {
 			case TokenPlus: tokenGenerator->getStream() << "ADD " << std::endl; break;
