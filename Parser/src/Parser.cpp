@@ -741,7 +741,7 @@ void ParseVisitor::makeNode(Node* node) {
 		if (firstLeaf->getToken()->tokenType == TokenIdentifier) {
 			Node* secondNode = node->getChildren()->at(1);
 			secondNode->makeCode(this); //EXP
-			tokenGenerator->getStream() << "LA " << "$" << static_cast<LexemToken*>(firstLeaf->getToken())->symbolTableKeyReference->ident<< " ";
+			tokenGenerator->getStream() << "LA " << "$" << static_cast<LexemToken*>(firstLeaf->getToken())->symbolTableKeyReference->ident<< std::endl;
 			firstNode->makeCode(this); //INDEX
 			tokenGenerator->getStream() << "STR" << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordWrite) {
@@ -750,7 +750,7 @@ void ParseVisitor::makeNode(Node* node) {
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordRead) {
 			tokenGenerator->getStream() << "REA " << std::endl;
 			Leaf* thirdLeaf = node->getLeafs()->at(2);
-			tokenGenerator->getStream() << "LA " << "$" << static_cast<LexemToken*>(thirdLeaf->getToken())->symbolTableKeyReference->ident << " ";
+			tokenGenerator->getStream() << "LA " << "$" << static_cast<LexemToken*>(thirdLeaf->getToken())->symbolTableKeyReference->ident << std::endl;
 			firstNode->makeCode(this); //INDEX
 			tokenGenerator->getStream() << "STR" << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenBracketOpen2) {
@@ -803,7 +803,7 @@ void ParseVisitor::makeNode(Node* node) {
 			node->getChildren()->at(0)->makeCode(this); //EXP
 		} else if (firstLeaf->getToken()->tokenType == TokenIdentifier) {
 			Token* token = node->getLeafs()->at(0)->getToken();
-			tokenGenerator->getStream() << "LA " << "$" << *static_cast<LexemToken*>(token)->symbolTableKeyReference->ident << " ";
+			tokenGenerator->getStream() << "LA " << "$" << *static_cast<LexemToken*>(token)->symbolTableKeyReference->ident << std::endl;
 			node->getChildren()->at(0)->makeCode(this); //INDEX
 			tokenGenerator->getStream() << "LV " << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenInteger) {
