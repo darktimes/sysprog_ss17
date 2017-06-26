@@ -5,10 +5,9 @@
 #include "SymbolTable.h"
 
 struct TokenInfo {
-		TokenInfo(int line, int col, NodeCheckType type = NoType);
+		TokenInfo(int line, int col);
 		int line;
 		int col;
-		NodeCheckType checkType;
 	};
 
 struct TokenBufferInfo {

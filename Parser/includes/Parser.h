@@ -15,6 +15,7 @@ class Node;
 class ITokenGenerator {
 	public:
 		virtual Token* nextToken() = 0;
+		virtual std::ofstream& getStream() = 0;
 		virtual ~ITokenGenerator() {};
 };
 
@@ -29,7 +30,7 @@ class ParseVisitor {
 		bool isErrored() const;
 		void nextToken();
 		void printParseError(String msg);
-		void printTypeCheckError();
+		void printTypeCheckError(String msg, Token* token = nullptr);
 
 	private:
 		ITokenGenerator* tokenGenerator;
@@ -49,12 +50,17 @@ class Parser: ITokenGenerator{
 		void makeCode();
 		bool isFinished() const;
 		Token* nextToken() override;
+		std::ofstream& getStream() override;
 		bool isErrored() const;
 
 	private:
 		SymbolTable symbolTable;
 		Scanner scanner;
 		ParseVisitor parseVisitor;
+
+		String outputFileName;
+		std::ofstream* outputStream;
+
 	public:
 		Node* root;
 };

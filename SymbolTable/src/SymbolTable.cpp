@@ -29,7 +29,7 @@ Symbol* SymbolTable::create(String str, TokenType tokenType) {
 					return symbol;
 				}
 			}
-	Symbol* result = new Symbol(str, tokenType);
+	Symbol* result = new Symbol(str, tokenType, NoType);
 	data[i].push_back(result);
 	existingElements++;
 	return result;
@@ -85,9 +85,10 @@ void SymbolTable::resize() {
 	}
 }
 
-Symbol::Symbol(String str, TokenType tokenType) {
+Symbol::Symbol(String str, TokenType tokenType, NodeCheckType checkType) {
 	this->ident = String(str);
 	this->tokenType = tokenType;
+	this->checkType = NoType;
 }
 
 Symbol::~Symbol() {

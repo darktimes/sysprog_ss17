@@ -41,7 +41,7 @@ NodeType Node::getNodeType() const {
 }
 
 Node::~Node() {
-	std::cout<<"node deleted: "<<nodeToString(nodeType)<<std::endl;
+//	std::cout<<"node deleted: "<<nodeToString(nodeType)<<std::endl;
 	delete children;
 	delete leafs;
 }
@@ -55,7 +55,7 @@ Token* Leaf::getToken() {
 }
 
 Leaf::~Leaf() {
-	std::cout<<"leaf deleted: "<<tokenToString(token->tokenType)<<std::endl;
+//	std::cout<<"leaf deleted: "<<tokenToString(token->tokenType)<<std::endl;
 }
 
 

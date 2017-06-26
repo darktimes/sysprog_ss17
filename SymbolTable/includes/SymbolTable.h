@@ -5,10 +5,11 @@
 #include <vector>
 class Symbol final {
 public:
-	Symbol(String ident, TokenType tokenType);
+	Symbol(String ident, TokenType tokenType, NodeCheckType type);
 	~Symbol();
 	String ident;
 	TokenType tokenType;
+	NodeCheckType checkType;
 
 private:
 };

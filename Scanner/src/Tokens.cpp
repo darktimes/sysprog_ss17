@@ -36,7 +36,7 @@ ErrorToken::~ErrorToken() {
 	delete err_msg;
 }
 
-TokenInfo::TokenInfo(int line, int col, NodeCheckType type) :line(line), col(col), checkType(type) {
+TokenInfo::TokenInfo(int line, int col) :line(line), col(col){
 
 }
 

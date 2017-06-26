@@ -92,7 +92,7 @@ T* ListItem<T>::getContent(){
 
 template<class T>
 ListItem<T>::~ListItem() {
-	std::cout<<"list item deleted"<<std::endl;
+//	std::cout<<"list item deleted"<<std::endl;
 }
 template<class T>
 List<T>::List(): length(0), first(nullptr), last(nullptr) {
@@ -101,7 +101,7 @@ List<T>::List(): length(0), first(nullptr), last(nullptr) {
 
 template<class T>
 List<T>::~List() {
-	std::cout<<"list deleted"<<std::endl;
+//	std::cout<<"list deleted"<<std::endl;
 	ListItem<T>* current = first;
 	if (length == 1) {
 		delete first;

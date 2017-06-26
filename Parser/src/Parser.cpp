@@ -2,22 +2,31 @@
 #include "Set.h"
 #include "TokenType.h"
 
+bool DEBUG;
 
 Parser::Parser(const char* file_path): symbolTable(SymbolTable()),scanner(Scanner(file_path, &symbolTable)),
-	parseVisitor(ParseVisitor(this)), root(new Node(NodeProg)) {
+	parseVisitor(ParseVisitor(this)), outputFileName(String("output-") + String(file_path)),
+	outputStream(new std::ofstream), root(new Node(NodeProg)) {
 //	symbolTable = SymbolTable();
 //	scanner = Scanner(file_path, &symbolTable);
 //	parseVisitor = ParseVisitor(this);
 //	root = Node(NodeProg);
 
 	symbolTable.create(String("while"), TokenKeyWordWhile);
-	//	symbolTable->create(String("WHILE"));
+	symbolTable.create(String("WHILE"), TokenKeyWordWhile);
 	symbolTable.create(String("if"), TokenKeyWordIf);
+	symbolTable.create(String("IF"), TokenKeyWordIf);
 	symbolTable.create(String("else"), TokenKeyWordElse);
+	symbolTable.create(String("ELSE"), TokenKeyWordElse);
 //	symbolTable->create(String("IF"));
 	symbolTable.create(String("int"), TokenKeyWordInt);
+	symbolTable.create(String("INT"), TokenKeyWordInt);
 	symbolTable.create(String("read"), TokenKeyWordRead);
+	symbolTable.create(String("READ"), TokenKeyWordRead);
 	symbolTable.create(String("write"), TokenKeyWordWrite);
+	symbolTable.create(String("WRITE"), TokenKeyWordWrite);
+
+
 }
 
 bool Parser::isFinished() const{
@@ -49,12 +58,22 @@ void Parser::typeCheck() {
 //	}
 }
 
+std::ofstream& Parser::getStream() {
+	return *outputStream;
+}
+
 void Parser::makeCode() {
+	remove(outputFileName.getStr());
+	outputStream->open(outputFileName.getStr());
 	parseVisitor.makeNode(root);
+	outputStream->close();
 }
 
 Parser::~Parser() {
+
 	delete root;
+	delete outputStream;
+
 }
 
 bool Parser::isErrored() const{
@@ -65,7 +84,15 @@ ParseVisitor::ParseVisitor(ITokenGenerator* tokenGenerator): tokenGenerator(toke
 	currentToken = nullptr;
 	errored = false;
 }
+
 int v = 0;
+int labelCount = 1;
+
+String generateLabel() {
+	return String("label") + String(labelCount++);
+}
+
+
 
 void ParseVisitor::nextToken() {
 
@@ -97,15 +124,16 @@ bool tokenMatches(Token* token, TokenType type) {
 
 
 void ParseVisitor::parseNode(Node* node) {
-//
-////	for (int e = 0; e < v; e ++){
-////		std::cout<<"   ";
-////	}
-////	v++;
-////	std::cout<<nodeToString(node->getNodeType())<<std::endl;
+	if (DEBUG) {
+		for (int e = 0; e < v; e ++){
+			std::cout<<"   ";
+		}
+		std::cout<<nodeToString(node->getNodeType())<<std::endl;
+		v++;
+	}
+
 
 	if (node->getNodeType() == NodeProg) {
-
 		if (Set::FirstProg->contains(currentToken)) {
 			Node* declsChild = new Node(NodeDecls);
 			declsChild->parse(this);
@@ -138,10 +166,6 @@ void ParseVisitor::parseNode(Node* node) {
 			}
 
 		} else if (!Set::FollowDecls->contains(currentToken)) {
-			std::cout<<Set::FollowDecls->getSize()<<std::endl;
-			for (unsigned i = 0; i < Set::FollowDecls->getSize(); i++) {
-				std::cout<<tokenToString(Set::FollowDecls->get(i))<<std::endl;
-			}
 			printParseError(String("Unexpected token in DECLS"));
 		}
 
@@ -184,7 +208,7 @@ void ParseVisitor::parseNode(Node* node) {
 						node->addLeaf(new Leaf(currentToken));
 						nextToken();
 					} else {
-						printParseError("Expected ]");
+						printParseError(String("Expected ]"));
 					}
 				} else {
 					printParseError(String("Expected integer"));
@@ -200,7 +224,7 @@ void ParseVisitor::parseNode(Node* node) {
 		if (Set::FirstStatement->contains(currentToken)) {
 			Node* statementChild = new Node(NodeStatement);
 			statementChild->parse(this);
-			statementChild->addChild(statementChild);
+			node->addChild(statementChild);
 
 			if (tokenMatches(currentToken,  TokenSemicolon)) {
 				node->addLeaf(new Leaf(currentToken));
@@ -296,7 +320,7 @@ void ParseVisitor::parseNode(Node* node) {
 					node->addLeaf(new Leaf(currentToken));
 					nextToken();
 				} else {
-					printParseError("Expected '}'");
+					printParseError(String("Expected '}'"));
 				}
 			} else if (tokenMatches(currentToken,  TokenKeyWordIf)) {
 				node->addLeaf(new Leaf(currentToken));
@@ -455,10 +479,24 @@ void ParseVisitor::parseNode(Node* node) {
 		}
 	}
 
+	if (DEBUG) {
+		v--;
+		for (int e = 0; e < v; e ++){
+			std::cout<<"   ";
+		}
+		std::cout<<"\\"<<nodeToString(node->getNodeType())<<std::endl;
+	}
+
 }
 
 void ParseVisitor::checkNode(Node* node) {
-	std::cout<<"Checking..."<<nodeToString(node->getNodeType())<<std::endl;
+	if (DEBUG) {
+		for (int e = 0; e < v; e ++){
+			std::cout<<"   ";
+		}
+		std::cout<<nodeToString(node->getNodeType())<<std::endl;
+		v++;
+	}
 	if (node->getNodeType() == NodeProg) {
 		node->type = NoType;
 		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
@@ -474,18 +512,18 @@ void ParseVisitor::checkNode(Node* node) {
 	} else if (node->getNodeType() == NodeDecl) {
 		Node* arrayNode = node->getChildren()->at(0);
 		arrayNode->checkType(this);
-		Token* token = node->getLeafs()->at(1)->getToken();
-		if (token->tokenInfo->checkType != NoType) {
-			printParseError("Identifier already defined");
+		LexemToken* token = static_cast<LexemToken*>(node->getLeafs()->at(1)->getToken());
+		if (token->symbolTableKeyReference->checkType != NoType) {
+			printTypeCheckError(String("Identifier already defined"), token);
 			node->type = ErrorType;
 		} else if (arrayNode->type == ErrorType) {
 			node->type = ErrorType;
 		} else {
 			node->type = NoType;
 			if (arrayNode->type == ArrayType) {
-				token->tokenInfo->checkType = IntArrayType;
+				token->symbolTableKeyReference->checkType = IntArrayType;
 			} else {
-				token->tokenInfo->checkType = IntType;
+				token->symbolTableKeyReference->checkType = IntType;
 			}
 		}
 	} else if (node->getNodeType() == NodeArray) {
@@ -494,20 +532,11 @@ void ParseVisitor::checkNode(Node* node) {
 
 			Leaf* leaf = node->getLeafs()->at(1);
 
-			Token* token = leaf->getToken();
-
-			IntegerToken* a = dynamic_cast<IntegerToken*>(token);
-			if (a) {
-				std::cout<<"a"<<std::endl;
-			} else {
-				std::cout<<"b"<<std::endl;
-			}
-
 			if (static_cast<IntegerToken*>(leaf->getToken())->value > 0) {
 
 				node->type = ArrayType;
 			} else {
-				printParseError("Invalid dimension");
+				printTypeCheckError(String("Invalid dimension"), leaf->getToken());
 				node->type = ErrorType;
 			}
 		} else {
@@ -521,34 +550,36 @@ void ParseVisitor::checkNode(Node* node) {
 	} else if (node->getNodeType() == NodeStatement) {
 		Leaf* firstLeaf = node->getLeafs()->at(0);
 		Node* firstNode = node->getChildren()->at(0);
+
 		if (firstLeaf->getToken()->tokenType == TokenIdentifier) {
-			for (unsigned i = node->getChildren()->getLength() - 1; i <= 0; i--) {
-				node->getChildren()->at(i)->checkType(this);
+			for (unsigned i = node->getChildren()->getLength(); i > 0; i--) {
+				node->getChildren()->at(i - 1)->checkType(this);
 			}
-			if (firstLeaf->getToken()->tokenInfo->checkType == NoType) {
+			LexemToken* lexemToken = static_cast<LexemToken*>(firstLeaf->getToken());
+			if (lexemToken->symbolTableKeyReference->checkType == NoType) {
 				node->type = ErrorType;
-				printParseError("Identifier not found");
 			} else if (node->getChildren()->at(1)->type == IntType &&
-					((firstLeaf->getToken()->tokenInfo->checkType == IntType && firstNode->type == NoType) ||
-					(firstLeaf->getToken()->tokenInfo->checkType == IntArrayType && firstNode->type == ArrayType))) {
+					((lexemToken->symbolTableKeyReference->checkType == IntType && firstNode->type == NoType) ||
+					(lexemToken->symbolTableKeyReference->checkType == IntArrayType && firstNode->type == ArrayType))) {
 				node->type = NoType;
 			} else {
 				node->type = ErrorType;
-				printParseError("Incompatible types");
+				printTypeCheckError(String("Incompatible types"));
 			}
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordWrite) {
 			firstNode->checkType(this);
 			node->type = NoType;
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordRead) {
 			node->getChildren()->at(1)->checkType(this);
-			if (node->getLeafs()->at(2)->getToken()->tokenInfo->checkType == NoType) {
-				printParseError("Identifier not found");
+
+			if (static_cast<LexemToken*>(node->getLeafs()->at(2)->getToken())->symbolTableKeyReference->checkType == NoType) {
+				printTypeCheckError(String("Identifier not found"),node->getLeafs()->at(2)->getToken());
 				node->type = ErrorType;
-			} else if ((node->getLeafs()->at(2)->getToken()->tokenInfo->checkType == IntType && node->getChildren()->at(1)->type == NoType) ||
-					(node->getLeafs()->at(2)->getToken()->tokenInfo->checkType == IntArrayType && node->getChildren()->at(1)->type == ArrayType)) {
+			} else if ((static_cast<LexemToken*>(node->getLeafs()->at(2)->getToken())->symbolTableKeyReference->checkType == IntType && node->getChildren()->at(1)->type == NoType) ||
+					(static_cast<LexemToken*>(node->getLeafs()->at(2)->getToken())->symbolTableKeyReference->checkType == IntArrayType && node->getChildren()->at(1)->type == ArrayType)) {
 				node->type = NoType;
 			} else {
-				printParseError("Incompatible types");
+				printTypeCheckError(String("Incompatible types"));
 				node->type = ErrorType;
 			}
 		} else if (firstLeaf->getToken()->tokenType == TokenBracketOpen2) {
@@ -585,6 +616,7 @@ void ParseVisitor::checkNode(Node* node) {
 			node->type = NoType;
 		}
 	} else if (node->getNodeType() == NodeExp) {
+
 		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
 			node->getChildren()->at(i)->checkType(this);
 		}
@@ -596,44 +628,46 @@ void ParseVisitor::checkNode(Node* node) {
 			node->type = node->getChildren()->at(1)->type;
 		}
 	} else if(node->getNodeType() == NodeExp2) {
-		Node* firstChild = node->getChildren()->at(0);
-		if (firstChild->getNodeType() == NodeExp) {
-			firstChild->checkType(this);
-			node->type = firstChild->type;
-		} else if (firstChild->getNodeType() == NodeIndex) {
-			firstChild->checkType(this);
-			Token* token = node->getLeafs()->at(0)->getToken();
-			if (token->tokenInfo->checkType == NoType) {
-				printParseError("Identifier not found");
-				node->type = ErrorType;
-			} else if (token->tokenInfo->checkType == IntType && firstChild->type == NoType) {
-				//TODO:: prolly, IntType
-				node->type = token->tokenInfo->checkType;
-			} else if (token->tokenInfo->checkType == IntArrayType && firstChild->type == ArrayType) {
-				//TODO: prolly IntArrayType
-				node->type = IntType;
-			} else {
-				node->type = ErrorType;
-				printParseError("Not a primitive type");
-			}
-		} else if (dynamic_cast<IntegerToken*>(node->getLeafs()->at(0)->getToken())) {
+		if (node->getChildren()->getLength() == 0) {
 			node->type = IntType;
-		} else if (node->getLeafs()->at(0)->getToken()->tokenType == TokenMinus) {
-			node->getChildren()->at(0)->checkType(this);
-			node->type = node->getChildren()->at(0)->type;
-		} else if (node->getLeafs()->at(0)->getToken()->tokenType == TokenExclamation) {
-			node->getChildren()->at(0)->checkType(this);
-			if (node->getChildren()->at(0)->type != IntType) {
-				node->type = ErrorType;
-			} else {
-				node->type = IntType;
+		} else {
+			Node* firstChild = node->getChildren()->at(0);
+			if (firstChild->getNodeType() == NodeExp) {
+				firstChild->checkType(this);
+				node->type = firstChild->type;
+			} else if (firstChild->getNodeType() == NodeIndex) {
+				firstChild->checkType(this);
+				LexemToken* token = static_cast<LexemToken*>(node->getLeafs()->at(0)->getToken());
+				if (token->symbolTableKeyReference->checkType == NoType) {
+
+					printTypeCheckError(String("Identifier not found"), token);
+					node->type = ErrorType;
+
+				} else if (token->symbolTableKeyReference->checkType == IntType && firstChild->type == NoType) {
+					node->type = token->symbolTableKeyReference->checkType;
+				} else if (token->symbolTableKeyReference->checkType == IntArrayType && firstChild->type == ArrayType) {
+					node->type = IntType;
+				} else {
+					node->type = ErrorType;
+					printTypeCheckError(String("Not a primitive type"), token);
+				}
+			} else if (node->getLeafs()->at(0)->getToken()->tokenType == TokenMinus) {
+				node->getChildren()->at(0)->checkType(this);
+				node->type = node->getChildren()->at(0)->type;
+			} else if (node->getLeafs()->at(0)->getToken()->tokenType == TokenExclamation) {
+				node->getChildren()->at(0)->checkType(this);
+				if (node->getChildren()->at(0)->type != IntType) {
+					node->type = ErrorType;
+				} else {
+					node->type = IntType;
+				}
 			}
 		}
 	} else if (node->getNodeType() == NodeOpExp) {
-		if (node->getChildren()->getLength() != 0) {
-			for (unsigned i = 0; i <= node->getChildren()->getLength(); i++) {
-				node->getChildren()->at(i)->checkType(this);
-			}
+		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
+			node->getChildren()->at(i)->checkType(this);
+		}
+		if (node->getChildren()->getLength() == 2) {
 			node->type = node->getChildren()->at(1)->type;
 		} else {
 			node->type = NoType;
@@ -652,111 +686,99 @@ void ParseVisitor::checkNode(Node* node) {
 			default: node->type = ErrorType;
 		}
 	}
-	std::cout<<"Exiting..."<<nodeToString(node->getNodeType())<<std::endl;
+	if (DEBUG) {
+		v--;
+		for (int e = 0; e < v; e ++){
+			std::cout<<"   ";
+		}
+		std::cout<<"\\"<<nodeToString(node->getNodeType())<<std::endl;
+	}
 }
 
 //TODO makeNode
 void ParseVisitor::makeNode(Node* node) {
-	if (node->getNodeType() == NodeProg) {
-		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
-					Node* current = node->getChildren()->at(i);
-					current->makeCode(this);
-				}
-		std::cout << "STP" << std::endl;
-//		if (node->getChildren()->getLength() > 1) {
-//			node->getChildren()->at(0)->makeCode(this); //DECLS
-//			node->getChildren()->at(1)->makeCode(this); //STATEMENTS
-//			std::cout << node->getChildren()->at(0)->getNodeType() << std::endl;
-//			std::cout << "STP" << std::endl;
-//		}
+	if (DEBUG) {
+		for (int e = 0; e < v; e ++){
+			std::cout<<"   ";
+		}
+		std::cout<<nodeToString(node->getNodeType())<<std::endl;
+		v++;
 	}
-
-	else if (node->getNodeType() == NodeDecls) {
-		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
-					Node* current = node->getChildren()->at(i);
-					current->makeCode(this);
-				}
-
-//		if (node->getChildren()->getLength() > 1) {
-//			node->getChildren()->at(0)->makeCode(this); //DECL
-//			node->getChildren()->at(1)->makeCode(this); //DECLS
-//		}
-
-		//TODO epsilon
-
-	} else if (node->getNodeType() == NodeDecl) {
-
-		if (node->getLeafs()->getLength() > 1) {
-			Token* token = node->getLeafs()->at(1)->getToken();
-					std::cout << "DS " << " $" << tokenToString(token->tokenType) << " ";
-		}
-
-		Node* arrayNode = node->getChildren()->at(0);
-		arrayNode->makeCode(this); //ARRAY
-	} else if (node->getNodeType() == NodeArray) {
-		std::cout << "hello array" << std::endl;
-		if (node->getLeafs()->getLength() != 0) {
-			Leaf* leaf = node->getLeafs()->at(1);
-			std::cout << static_cast<IntegerToken*>(leaf->getToken())->value << std::endl;
-		} else {
-			std::cout << 1 << std::endl;
-		}
-	} else if (node->getNodeType() == NodeStatements){
-
+	if (node->getNodeType() == NodeProg) {
 		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
 			node->getChildren()->at(i)->makeCode(this);
 		}
+		tokenGenerator->getStream() << "STP" << std::endl;
+	} else if (node->getNodeType() == NodeDecls) {
+		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
+			node->getChildren()->at(i)->makeCode(this);
+		}
+	} else if (node->getNodeType() == NodeDecl) {
+		if (node->getLeafs()->getLength() > 1) {
+			Token* token = node->getLeafs()->at(1)->getToken();
+			tokenGenerator->getStream() << "DS " << "$" << static_cast<LexemToken*>(token)->symbolTableKeyReference->ident<< " ";
+		}
+		node->getChildren()->at(0)->makeCode(this);//ARRAY
+	} else if (node->getNodeType() == NodeArray) {
+		if (node->getLeafs()->getLength() == 3) {
+			Leaf* leaf = node->getLeafs()->at(1);
+			tokenGenerator->getStream() << static_cast<IntegerToken*>(leaf->getToken())->value << std::endl;
+		} else {
+			tokenGenerator->getStream() << 1 << std::endl;
+		}
+	} else if (node->getNodeType() == NodeStatements){
+		if (node->getChildren()->getLength() != 0) {
+			for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
+				node->getChildren()->at(i)->makeCode(this);
+			}
 
-		std::cout << "NOP" << std::endl;
-//		if (node->getLeafs()->getLength() != 0) {
-//			node->getChildren()->at(0)->makeCode(this); //STATEMENT
-//			node->getChildren()->at(1)->makeCode(this); //STATEMENTS
-//
-//		} else {
-//			std::cout << "NOP" << std::endl;
-//		}
-
-		//TODO epsilon
+		} else {
+			tokenGenerator->getStream() << "NOP" << std::endl;
+		}
 	} else if (node->getNodeType() == NodeStatement) {
 		Leaf* firstLeaf = node->getLeafs()->at(0);
 		Node* firstNode = node->getChildren()->at(0);
 		if (firstLeaf->getToken()->tokenType == TokenIdentifier) {
 			Node* secondNode = node->getChildren()->at(1);
 			secondNode->makeCode(this); //EXP
-			std::cout << "LA " << " $" << tokenToString(firstLeaf->getToken()->tokenType) << " ";
+			tokenGenerator->getStream() << "LA " << "$" << static_cast<LexemToken*>(firstLeaf->getToken())->symbolTableKeyReference->ident<< " ";
 			firstNode->makeCode(this); //INDEX
-			std::cout << "STR" << std::endl;
+			tokenGenerator->getStream() << "STR" << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordWrite) {
 			firstNode->makeCode(this); //EXP
-			std::cout << "PRI " << std::endl;
+			tokenGenerator->getStream() << "PRI " << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordRead) {
-			std::cout << "REA " << std::endl;
+			tokenGenerator->getStream() << "REA " << std::endl;
 			Leaf* thirdLeaf = node->getLeafs()->at(2);
-			std::cout << "LA " << " $" << tokenToString(thirdLeaf->getToken()->tokenType) << " ";
+			tokenGenerator->getStream() << "LA " << "$" << static_cast<LexemToken*>(thirdLeaf->getToken())->symbolTableKeyReference->ident << " ";
 			firstNode->makeCode(this); //INDEX
-			std::cout << "STR" << std::endl;
+			tokenGenerator->getStream() << "STR" << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenBracketOpen2) {
 			firstNode->makeCode(this); //STATEMENTS
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordIf) {
 			firstNode->makeCode(this); //EXP
-			std::cout << "JIN " << " # " << "label1" << std::endl;
+			String label1 = generateLabel();
+			String label2 = generateLabel();
+			tokenGenerator->getStream() << "JIN " << " # " << label1 << std::endl;
 			node->getChildren()->at(1)->makeCode(this); //STATEMENT
-			std::cout << "JIN" << " # " << "label2" << std::endl;
-			std::cout << "#" << "label1" << " NOP" << std::endl;
+			tokenGenerator->getStream() << "JIN" << " # " << label2 << std::endl;
+			tokenGenerator->getStream() << "#" << label1 << " NOP" << std::endl;
 			node->getChildren()->at(2)->makeCode(this); //STATEMENT
-			std::cout << " # " << " label2 " << " NOP" << std::endl;
+			tokenGenerator->getStream() << " # " << label2 << " NOP" << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordWhile) {
-			std::cout << " # " << " label1 " << "NOP" << std::endl;
+			String label1 = generateLabel();
+			String label2 = generateLabel();
+			tokenGenerator->getStream() << " # " << label1 << "NOP" << std::endl;
 			firstNode->makeCode(this); //EXP
-			std::cout << "JIN " << " # " << " label2" << std::endl;
+			tokenGenerator->getStream() << "JIN " << " # " << label2 << std::endl;
 			node->getChildren()->at(1)->makeCode(this); //STATEMENT
-			std::cout << "JMP " << " # " << " label1" << std::endl;
-			std::cout << "# " << " label2 " << "NOP" << std::endl;
+			tokenGenerator->getStream() << "JMP " << " # " << label1 << std::endl;
+			tokenGenerator->getStream() << "# " << label2 << "NOP" << std::endl;
 		}
 	} else if (node->getNodeType() == NodeIndex) {
 		if (node->getLeafs()->getLength() != 0) {
 			node->getChildren()->at(0)->makeCode(this);
-			std::cout << "ADD " << std::endl;
+			tokenGenerator->getStream() << "ADD " << std::endl;
 		}
 
 		//TODO epsilon
@@ -766,11 +788,14 @@ void ParseVisitor::makeNode(Node* node) {
 		} else if (node->getChildren()->at(1)->type == OpGreater) {
 			node->getChildren()->at(1)->makeCode(this); //OP_EXP
 			node->getChildren()->at(0)->makeCode(this); //EXP2
-			std::cout << "LES" << std::endl;
+			tokenGenerator->getStream() << "LES" << std::endl;
 		} else if (node->getChildren()->at(1)->type == OpUnequal) {
 			node->getChildren()->at(0)->makeCode(this); //EXP2
 			node->getChildren()->at(1)->makeCode(this); //OP_EXP
-			std::cout << "NOT" << std::endl;
+			tokenGenerator->getStream() << "NOT" << std::endl;
+		} else {
+			node->getChildren()->at(0)->makeCode(this); //EXP2
+			node->getChildren()->at(1)->makeCode(this); //OP_EXP
 		}
 	} else if(node->getNodeType() == NodeExp2) {
 		Leaf* firstLeaf = node->getLeafs()->at(0);
@@ -778,43 +803,47 @@ void ParseVisitor::makeNode(Node* node) {
 			node->getChildren()->at(0)->makeCode(this); //EXP
 		} else if (firstLeaf->getToken()->tokenType == TokenIdentifier) {
 			Token* token = node->getLeafs()->at(0)->getToken();
-			std::cout << "LA " << " $" << tokenToString(token->tokenType) << " ";
+			tokenGenerator->getStream() << "LA " << "$" << *static_cast<LexemToken*>(token)->symbolTableKeyReference->ident << " ";
 			node->getChildren()->at(0)->makeCode(this); //INDEX
-			std::cout << "LV " << std::endl;
+			tokenGenerator->getStream() << "LV " << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenInteger) {
 			//dynamic_cast<IntegerToken*>(node->getLeafs()->at(0)->getToken())
-			std::cout << "LC " <<  static_cast<IntegerToken*>(node->getLeafs()->at(0)->getToken())->value << std::endl;
+			tokenGenerator->getStream() << "LC " <<  static_cast<IntegerToken*>(node->getLeafs()->at(0)->getToken())->value << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenMinus) {
-			std::cout << "LC " << 0 << std::endl;
+			tokenGenerator->getStream() << "LC " << 0 << std::endl;
 			node->getChildren()->at(0)->makeCode(this); //EXP2
-			std::cout << "SUB " << std::endl;
+			tokenGenerator->getStream() << "SUB " << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenExclamation) {
 			node->getChildren()->at(0)->makeCode(this); //EXP2
-			std::cout << "NOT " << std::endl;
+			tokenGenerator->getStream() << "NOT " << std::endl;
 
 		}
 	} else if (node->getNodeType() == NodeOpExp) {
-		if (node->getLeafs()->getLength() != 0) {
-			node->getChildren()->at(0)->makeCode(this);
-			node->getChildren()->at(1)->makeCode(this);
+		for (unsigned i = 0; i < node->getChildren()->getLength();i++) {
+			node->getChildren()->at(i)->makeCode(this);
 		}
-		//TODO epsilon
 
 	} else if (node->getNodeType() == NodeOp) {
 		switch (node->getLeafs()->at(0)->getToken()->tokenType) {
-			case TokenPlus: std::cout << "ADD " << std::endl; break;
-			case TokenMinus: std::cout << "SUB " << std::endl; break;
-			case TokenAsterisk: std::cout << "MUL " << std::endl; break;
-			case TokenColon: std::cout << "DIV " << std::endl; break;
-			case TokenLessThan: std::cout << "LES " << std::endl; break;
+			case TokenPlus: tokenGenerator->getStream() << "ADD " << std::endl; break;
+			case TokenMinus: tokenGenerator->getStream() << "SUB " << std::endl; break;
+			case TokenAsterisk: tokenGenerator->getStream() << "MUL " << std::endl; break;
+			case TokenColon: tokenGenerator->getStream() << "DIV " << std::endl; break;
+			case TokenLessThan: tokenGenerator->getStream() << "LES " << std::endl; break;
 			case TokenGreaterThan: ; break;
-			case TokenAnd: std::cout << "AND " << std::endl; break;
-			case TokenEquals1: std::cout << "EQU " << std::endl; break;
-			case TokenEquals3: std::cout << "EQU " << std::endl; break;
+			case TokenAnd: tokenGenerator->getStream() << "AND " << std::endl; break;
+			case TokenEquals1: tokenGenerator->getStream() << "EQU " << std::endl; break;
+			case TokenEquals3: tokenGenerator->getStream() << "EQU " << std::endl; break;
 			default: std::cout << "error NodeOp" << std::endl;break;
 		}
 	}
-	//std::cout<<"Exiting coding..."<<nodeToString(node->getNodeType())<<std::endl;
+	if (DEBUG) {
+		v--;
+		for (int e = 0; e < v; e ++){
+			std::cout<<"   ";
+		}
+		std::cout<<"\\"<<nodeToString(node->getNodeType())<<std::endl;
+	}
 }
 
 
@@ -823,49 +852,73 @@ bool ParseVisitor::isErrored() const {
 	return errored;
 }
 
-void ParseVisitor::printTypeCheckError() {
+void ParseVisitor::printTypeCheckError(String msg, Token* token) {
 	errored = true;
+	std::cout<<msg;
+	if (token) {
+		std::cout<<", line:"<<token->tokenInfo->line<<", col: "<<token->tokenInfo->col;
+		if (LexemToken* lexemToken = dynamic_cast<LexemToken*>(token)) {
+			std::cout<<", lexem: "<<lexemToken->symbolTableKeyReference->ident;
+		} else if (IntegerToken* integerToen = dynamic_cast<IntegerToken*>(token)) {
+			std::cout<<", value: "<<integerToen->value;
+		}
+		std::cout<<", tokenType:"<<tokenToString(token->tokenType)<<std::endl;
+	}
 }
 
 void ParseVisitor::printParseError(String msg) {
 	errored = true;
-
 	std::cout<<msg<<", token: "<<(currentToken? tokenToString(currentToken->tokenType): "undefined")<<" at: line - "<<currentToken->tokenInfo->line<<", column - "<<currentToken->tokenInfo->col<<std::endl;
 }
 
 
 int main(int argc, char **argv) {
-
+	DEBUG = false;
 	if (argc < 2) {
 		std::cout<<"No file specified  to work with. Exiting..."<<std::endl;
 		return -1;
-	} else if (argc > 2) {
-		std::cout<<"Warning. Too much arguments. Arguments after 2nd one will be ignored"<<std::endl;
+	} else if (argc >= 3) {
+		String arg1 = String(argv[1]);
+		if (arg1.compare(String("--debug"))) {
+			DEBUG = true;
+			std::cout<<"Printing debug info activated."<<std::endl;
+		} else {
+			std::cout<<"Warning. Too much arguments. Assuming file argument is the last one."<<std::endl;
+		}
+
 	}
 
-	Parser parser = Parser(argv[1]);
+	Parser parser = Parser(argv[argc - 1]);
 	if (parser.isFinished()) {
 		std::cout<<"There was an error, opening file. Exiting..."<<std::endl;
 		return -1;
 	}
 	std::cout<<"Parsing..."<<std::endl;
 	parser.parse();
+	if (DEBUG) {
+		for (unsigned i = 0; i < 3; i++)
+			std::cout<<'\n';
+	}
 	if (parser.isErrored()) {
 		std::cout<<"There were errors, while generating parse tree. Aborting..."<<std::endl;
 	} else {
 		std::cout<<"Checking types..."<<std::endl;
 
-
-
-		//parser.typeCheck();
+		parser.typeCheck();
+		if (DEBUG) {
+			for (unsigned i = 0; i < 3; i++)
+					std::cout<<'\n';
+		}
 		if (parser.isErrored()) {
 			std::cout<<"There were errors, while evaluating types. Aborting..."<<std::endl;
 		} else {
-			std::cout<<"Making code"<<std::endl;
+			std::cout<<"Making code..."<<std::endl;
 			//make code
 			parser.makeCode();
 			if (parser.isErrored()) {
 				std::cout << "There were errors, while generating code. Aborting.. " << std::endl;
+			} else {
+				std::cout<<"Done."<<std::endl;
 			}
 		}
 	}
