@@ -2,6 +2,7 @@
 
 FileReader::FileReader(const char* filePath) {
     readFile = new std::ifstream(filePath);
+    strBuffer = readFile->rdbuf();
     opened = readFile->is_open();
 }
 
@@ -15,14 +16,8 @@ BufferBlock* FileReader::getBufferBlockAt(unsigned int blockIndex)
     }
         
     char* blockContent = new char[Buffer::BLOCK_SIZE];
-    readFile->seekg(blockIndex * Buffer::BLOCK_SIZE);
-    readFile->get(blockContent, Buffer::BLOCK_SIZE + 2, '\0');
-    unsigned int length = readFile->gcount();
-    if (length == 0) {
-    	return nullptr;
-    } else {
-    	length -= 1;
-    }
+    strBuffer->pubseekpos(blockIndex * Buffer::BLOCK_SIZE);
+    std::streamsize length = strBuffer->sgetn(blockContent, Buffer::BLOCK_SIZE);
     return new BufferBlock(blockContent, length);
 }
 
