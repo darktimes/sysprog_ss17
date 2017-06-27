@@ -571,16 +571,18 @@ void ParseVisitor::checkNode(Node* node) {
 			firstNode->checkType(this);
 			node->type = NoType;
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordRead) {
-			node->getChildren()->at(1)->checkType(this);
-
-			if (static_cast<LexemToken*>(node->getLeafs()->at(2)->getToken())->symbolTableKeyReference->checkType == NoType) {
+			node->getChildren()->at(0)->checkType(this);
+			std::cout<<node->toString()<<std::endl;
+			NodeCheckType leafCheckType = static_cast<LexemToken*>(node->getLeafs()->at(2)->getToken())->symbolTableKeyReference->checkType;
+			NodeCheckType identCheckType = node->getChildren()->at(0)->type;
+			if (leafCheckType == NoType) {
 				printTypeCheckError(String("Identifier not found"),node->getLeafs()->at(2)->getToken());
 				node->type = ErrorType;
-			} else if ((static_cast<LexemToken*>(node->getLeafs()->at(2)->getToken())->symbolTableKeyReference->checkType == IntType && node->getChildren()->at(1)->type == NoType) ||
-					(static_cast<LexemToken*>(node->getLeafs()->at(2)->getToken())->symbolTableKeyReference->checkType == IntArrayType && node->getChildren()->at(1)->type == ArrayType)) {
+			} else if ((leafCheckType == IntType && identCheckType == NoType) ||
+					(leafCheckType == IntArrayType && identCheckType == ArrayType)) {
 				node->type = NoType;
 			} else {
-				printTypeCheckError(String("Incompatible types"));
+				printTypeCheckError(String("Incompatible types"), node->getLeafs()->at(2)->getToken());
 				node->type = ErrorType;
 			}
 		} else if (firstLeaf->getToken()->tokenType == TokenBracketOpen2) {
@@ -611,7 +613,7 @@ void ParseVisitor::checkNode(Node* node) {
 			if (node->getChildren()->at(0)->type == ErrorType) {
 				node->type = ErrorType;
 			} else {
-				node->type = NoType;
+				node->type = ArrayType;
 			}
 		} else {
 			node->type = NoType;
@@ -640,7 +642,6 @@ void ParseVisitor::checkNode(Node* node) {
 				firstChild->checkType(this);
 				LexemToken* token = static_cast<LexemToken*>(node->getLeafs()->at(0)->getToken());
 				if (token->symbolTableKeyReference->checkType == NoType) {
-
 					printTypeCheckError(String("Identifier not found"), token);
 					node->type = ErrorType;
 
@@ -861,6 +862,8 @@ void ParseVisitor::printTypeCheckError(String msg, Token* token) {
 			std::cout<<", value: "<<integerToen->value;
 		}
 		std::cout<<", tokenType:"<<tokenToString(token->tokenType)<<std::endl;
+	} else {
+		std::cout<<std::endl;
 	}
 }
 

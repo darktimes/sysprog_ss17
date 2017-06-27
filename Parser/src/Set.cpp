@@ -4,7 +4,7 @@
 
 
 const TokenType  FirstDeclElems[1] = {TokenKeyWordInt};
-const TokenType FirstOpElems[8] = {TokenPlus, TokenMinus, TokenAsterisk, TokenColon, TokenGreaterThan, TokenLessThan, TokenEquals1, TokenEquals3};
+const TokenType FirstOpElems[9] = {TokenPlus, TokenMinus, TokenAsterisk, TokenColon, TokenGreaterThan, TokenLessThan, TokenEquals1, TokenEquals3, TokenAnd};
 const TokenType FirstStatementElems[6] = {TokenIdentifier, TokenKeyWordWrite, TokenKeyWordRead, TokenBracketOpen2, TokenKeyWordIf, TokenKeyWordWhile};
 const TokenType FirstExp2Elems[5] = {TokenBracketOpen1, TokenIdentifier, TokenInteger, TokenMinus, TokenExclamation};
 const TokenType FirstArrayElems[1] = {TokenBracketOpen3};
@@ -19,7 +19,7 @@ const TokenType FollowOpExpElems[4] = {TokenBracketClose3, TokenBracketClose1, T
 
 const Set* const Set::FirstDecl = new Set(FirstDeclElems, 1,  false);
 //const Set* const Set::FirstDecls = new Set(FirstDeclElems, true);
-const Set* const Set::FirstOp = new Set(FirstOpElems, 8, false);
+const Set* const Set::FirstOp = new Set(FirstOpElems, 9, false);
 const Set* const Set::FirstStatement = new Set(FirstStatementElems, 6, false);
 //const Set* const Set::FirstStatements = new Set(FirstStatementElems, true);
 const Set* const Set::FirstExp2 = new Set(FirstExp2Elems, 5, false);

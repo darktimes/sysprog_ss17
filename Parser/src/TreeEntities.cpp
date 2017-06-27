@@ -99,6 +99,9 @@ String Leaf::toString(unsigned t) {
 	String result;
 	tabulate(result, t);
 	result += (String("Leaf:") + tokenToString(token->tokenType));
+	if (LexemToken* lexemTokem = dynamic_cast<LexemToken*>(token)) {
+		result += String(", ") + nodeTypeToString(lexemTokem->symbolTableKeyReference->checkType);
+	}
 	result += '\n';
 	return result;
 }
