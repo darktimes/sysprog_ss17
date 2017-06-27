@@ -1,13 +1,15 @@
 #include "SymbolTable.h"
 #include <stdlib.h>
-SymbolTable::SymbolTable() :tableSize(64), existingElements(0), data(new std::vector<Symbol*>[tableSize]) {
+SymbolTable::SymbolTable() :
+		tableSize(64), existingElements(0), data(
+				new std::vector<Symbol*>[tableSize]) {
 
 }
 
 SymbolTable::~SymbolTable() {
 	for (unsigned i = 0; i < tableSize; i++) {
 
-		for (Symbol* symbol: data[i]) {
+		for (Symbol* symbol : data[i]) {
 			delete symbol;
 		}
 
@@ -21,29 +23,19 @@ Symbol* SymbolTable::create(String str, TokenType tokenType) {
 	}
 	unsigned i = strhash(str);
 
-
-//	if (data[i] == nullptr) {
-//		data[i] = std::vector<Symbol*>();
-	for (Symbol* symbol: data[i]) {
-				if (symbol->ident.compare(str)) {
-					return symbol;
-				}
-			}
+	for (Symbol* symbol : data[i]) {
+		if (symbol->ident.compare(str)) {
+			return symbol;
+		}
+	}
 	Symbol* result = new Symbol(str, tokenType, NoType);
 	data[i].push_back(result);
 	existingElements++;
 	return result;
-//	} else {
-
-//		existingElements++;
-//		Symbol* result = new Symbol(str, tokenType);
-//		data[i].push_back(result);
-//		return result;
-//	}
 }
 
 Symbol* SymbolTable::getSymbolOf(String str) {
-	for (Symbol* symbol: data[strhash(str)]) {
+	for (Symbol* symbol : data[strhash(str)]) {
 		if (symbol->ident.compare(str)) {
 			return symbol;
 		}
@@ -56,8 +48,8 @@ Symbol* SymbolTable::getSymbolOf(String str) {
  */
 unsigned long SymbolTable::strhash(const String str, const unsigned offset) {
 	unsigned long hash = 5381;
-	for (int i = 0;  i < str.getSize(); i++) {
-		hash = hash * 33 + (int)str[i] + offset;
+	for (int i = 0; i < str.getSize(); i++) {
+		hash = hash * 33 + (int) str[i] + offset;
 	}
 	return hash % tableSize;
 }
