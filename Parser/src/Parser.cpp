@@ -782,16 +782,14 @@ void ParseVisitor::makeNode(Node* node) {
 			tokenGenerator->getStream() << "ADD " << std::endl;
 		}
 	} else if (node->getNodeType() == NodeExp) {
-		std::cout<<node->toString()<<std::endl;
+//		std::cout<<node->toString()<<std::endl;
 		if (node->getChildren()->at(1)->type == NoType) {
 			node->getChildren()->at(0)->makeCode(this); //EXP2
-		} else if (node->getChildren()->at(1)->type == OpGreater) {
-
-
+		} else if (node->getChildren()->at(1)->getChildren()->at(0)->type == OpGreater) {
 			node->getChildren()->at(1)->makeCode(this); //OP_EXP
 			node->getChildren()->at(0)->makeCode(this); //EXP2
 			tokenGenerator->getStream() << "LES" << std::endl;
-		} else if (node->getChildren()->at(1)->type == OpUnequal) {
+		} else if (node->getChildren()->at(1)->getChildren()->at(0)->type == OpUnequal) {
 			node->getChildren()->at(0)->makeCode(this); //EXP2
 			node->getChildren()->at(1)->makeCode(this); //OP_EXP
 			tokenGenerator->getStream() << "NOT" << std::endl;
