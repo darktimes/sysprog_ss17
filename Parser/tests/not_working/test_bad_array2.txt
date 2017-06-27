@@ -1,0 +1,10 @@
+int a;
+int b;
+{
+a := 5;
+b := a;
+while ( a =:= 3 )
+{
+ write( a[2] ); 
+};
+};
