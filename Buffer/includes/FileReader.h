@@ -19,6 +19,5 @@ public:
 private:
     std::ifstream* readFile;
 	std::streambuf* strBuffer;
-	unsigned int getContentLength(const char*);
     bool opened;
 };

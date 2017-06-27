@@ -5,7 +5,7 @@
 bool DEBUG;
 
 Parser::Parser(const char* file_path): symbolTable(SymbolTable()),scanner(Scanner(file_path, &symbolTable)),
-	parseVisitor(ParseVisitor(this)), outputFileName(String("output-") + String(file_path)),
+	parseVisitor(ParseVisitor(this)), outputFileName(String("output-") + String(file_path) + String(".code")),
 	outputStream(new std::ofstream), root(new Node(NodeProg)) {
 //	symbolTable = SymbolTable();
 //	scanner = Scanner(file_path, &symbolTable);
@@ -40,7 +40,6 @@ Token* Parser::nextToken() {
 		delete result;
 		result = scanner.nextToken();
 	}
-
 	return result;
 }
 
@@ -119,7 +118,7 @@ void ParseVisitor::nextToken() {
 }
 
 bool tokenMatches(Token* token, TokenType type) {
-	return ((token) && token->tokenType == type);
+	return (token) && (token->tokenType == type);
 }
 
 
@@ -342,7 +341,7 @@ void ParseVisitor::parseNode(Node* node) {
 						statementChild->parse(this);
 						node->addChild(statementChild);
 
-						if (tokenMatches(currentToken,  TokenKeyWordElse)) {
+						if (tokenMatches(currentToken, TokenKeyWordElse)) {
 							node->addLeaf(new Leaf(currentToken));
 							nextToken();
 
@@ -352,6 +351,7 @@ void ParseVisitor::parseNode(Node* node) {
 						} else {
 							printParseError(String("Expected 'else'"));
 						}
+
 					} else {
 						printParseError(String("Expected ')'"));
 					}
@@ -471,6 +471,7 @@ void ParseVisitor::parseNode(Node* node) {
 			printParseError(String("Unexpected token in OP_EXP"));
 		}
 	} else if (node->getNodeType() == NodeOp) {
+
 		if (Set::FirstOp->contains(currentToken)) {
 			node->addLeaf(new Leaf(currentToken));
 			nextToken();
@@ -761,21 +762,21 @@ void ParseVisitor::makeNode(Node* node) {
 			firstNode->makeCode(this); //EXP
 			String label1 = generateLabel();
 			String label2 = generateLabel();
-			tokenGenerator->getStream() << "JIN " << " # " << label1 << std::endl;
+			tokenGenerator->getStream() << "JIN " << " #" << label1 << std::endl;
 			node->getChildren()->at(1)->makeCode(this); //STATEMENT
-			tokenGenerator->getStream() << "JIN" << " # " << label2 << std::endl;
+			tokenGenerator->getStream() << "JIN" << " #" << label2 << std::endl;
 			tokenGenerator->getStream() << "#" << label1 << " NOP" << std::endl;
 			node->getChildren()->at(2)->makeCode(this); //STATEMENT
-			tokenGenerator->getStream() << " # " << label2 << " NOP" << std::endl;
+			tokenGenerator->getStream() << "#" << label2 << " NOP" << std::endl;
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordWhile) {
 			String label1 = generateLabel();
 			String label2 = generateLabel();
 			tokenGenerator->getStream() << " # " << label1 << "NOP" << std::endl;
 			firstNode->makeCode(this); //EXP
-			tokenGenerator->getStream() << "JIN " << " # " << label2 << std::endl;
+			tokenGenerator->getStream() << "JIN " << " #" << label2 << std::endl;
 			node->getChildren()->at(1)->makeCode(this); //STATEMENT
-			tokenGenerator->getStream() << "JMP " << " # " << label1 << std::endl;
-			tokenGenerator->getStream() << "# " << label2 << "NOP" << std::endl;
+			tokenGenerator->getStream() << "JMP " << " #" << label1 << std::endl;
+			tokenGenerator->getStream() << "#" << label2 << "NOP" << std::endl;
 		}
 	} else if (node->getNodeType() == NodeIndex) {
 		if (node->getLeafs()->getLength() != 0) {
@@ -872,7 +873,13 @@ void ParseVisitor::printTypeCheckError(String msg, Token* token) {
 
 void ParseVisitor::printParseError(String msg) {
 	errored = true;
-	std::cout<<msg<<", token: "<<(currentToken? tokenToString(currentToken->tokenType): "undefined")<<" at: line - "<<currentToken->tokenInfo->line<<", column - "<<currentToken->tokenInfo->col<<std::endl;
+
+	std::cout<<msg<<", token: ";
+	if (currentToken) {
+		std::cout<<tokenToString(currentToken->tokenType)<<" at: line - "<<currentToken->tokenInfo->line<<", column - "<<currentToken->tokenInfo->col<<std::endl;
+	} else {
+		std::cout<<"undefined"<<std::endl;
+	}
 }
 
 
