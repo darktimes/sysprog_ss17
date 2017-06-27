@@ -9,6 +9,7 @@ class ParseVisitor;
 
 
 String nodeToString(NodeType);
+String nodeTypeToString(NodeCheckType);
 
 
 template<typename T>
@@ -50,6 +51,7 @@ class Leaf {
 	public:
 		Token* getToken();
 		Leaf(Token* token);
+		String toString(unsigned t = 0);
 		virtual ~Leaf();
 	private:
 		Token* token;
@@ -67,6 +69,7 @@ class Node {
 		virtual ~Node();
 		List<Node>* getChildren();
 		List<Leaf>* getLeafs();
+		String toString(unsigned t = 0);
 
 
 	private:
@@ -125,7 +128,7 @@ T* List<T>::at(unsigned int index){
 		unsigned int i = 0;
 		ListItem<T>* current = first;
 		while (i != index) {
-			current = first->next;i++;
+			current = current->next;i++;
 		}
 		return current->getContent();
 	} else {

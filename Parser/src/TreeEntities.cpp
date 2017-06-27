@@ -46,6 +46,47 @@ Node::~Node() {
 	delete leafs;
 }
 
+String& tabulate(String& which, unsigned t) {
+	for (unsigned i = 0; i < t; i++) {
+		which += "   ";
+	}
+	return which;
+ }
+
+String Node::toString(unsigned t) {
+	String result;
+	if (t == 0) {
+		result = "------------------------------------------";
+		result += '\n';
+	} else {
+		tabulate(result, t);
+	}
+	result += (String("Node: ") + nodeToString(nodeType));
+	result += '\n';
+
+
+	tabulate(result, t);
+	result += (String("CheckType: ") + nodeTypeToString(type));
+	result += '\n';
+
+	tabulate(result, t + 1);
+
+	result += "children:";
+	result += '\n';
+
+	for (unsigned i = 0; i < getChildren()->getLength(); i++) {
+		result += getChildren()->at(i)->toString(t + 2);
+	}
+	result += '\n';
+	tabulate(result, t+1);
+	result += "leafs:";
+	result += '\n';
+	for (unsigned i = 0; i < getLeafs()->getLength(); i++) {
+		result += getLeafs()->at(i)->toString(t + 2);
+	}
+	return result;
+}
+
 Leaf::Leaf(Token* token): token(token) {
 
 }
@@ -54,6 +95,13 @@ Token* Leaf::getToken() {
 	return token;
 }
 
+String Leaf::toString(unsigned t) {
+	String result;
+	tabulate(result, t);
+	result += (String("Leaf:") + tokenToString(token->tokenType));
+	result += '\n';
+	return result;
+}
 Leaf::~Leaf() {
 //	std::cout<<"leaf deleted: "<<tokenToString(token->tokenType)<<std::endl;
 }
@@ -74,6 +122,27 @@ String nodeToString(NodeType nodeType) {
 		case NodeOpExp: return "OP_EXP";
 		case NodeOp: return "OP";
 		default: return "unknown";
+	}
+}
+
+String nodeTypeToString(NodeCheckType t) {
+	switch (t) {
+	case NotInited: return String ("NotInited");
+	case IntType: return String ("IntType");
+	case IntArrayType: return String ("IntArrayType");
+	case ArrayType: return String("ArrayType");
+	case NoType: return String("NoType");
+	case ErrorType: return String("ErrorType");
+	case OpPlus: return String("OpPlus");
+	case OpMinus: return String("OpPlus");
+	case OpMult: return String("OpMult");
+	case OpDiv: return String("OpDiv");
+	case OpLess: return String("OpLess");
+	case OpGreater: return String("OpGreater");
+	case OpEqual: return String("OpEqual");
+	case OpUnequal: return String("OpUnequal");
+	case OpAnd: return String("OpAnd");
+	default: return String("Eblan");
 	}
 }
 

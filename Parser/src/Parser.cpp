@@ -329,10 +329,6 @@ void ParseVisitor::parseNode(Node* node) {
 					node->addLeaf(new Leaf(currentToken));
 					nextToken();
 
-					std::cout<<std::endl;
-					std::cout<<std::endl;
-					std::cout<<std::endl;
-
 					Node* expNode = new Node(NodeExp);
 					expNode->parse(this);
 					node->addChild(expNode);
@@ -429,6 +425,7 @@ void ParseVisitor::parseNode(Node* node) {
 				indexChild->parse(this);
 				node->addChild(indexChild);
 			} else if (tokenMatches(currentToken,  TokenInteger)) {
+//				std::cout<<static_cast<IntegerToken*>(currentToken)->value<<std::endl;
 				node->addLeaf(new Leaf(currentToken));
 				nextToken();
 			} else if (tokenMatches(currentToken,  TokenMinus) || tokenMatches(currentToken,  TokenExclamation )) {
@@ -629,7 +626,7 @@ void ParseVisitor::checkNode(Node* node) {
 		} else if (node->getChildren()->at(1)->type != node->getChildren()->at(0)->type) {
 			node->type = ErrorType;
 		} else {
-			node->type = node->getChildren()->at(1)->type;
+			node->type = node->getChildren()->at(0)->type;
 		}
 	} else if(node->getNodeType() == NodeExp2) {
 		if (node->getChildren()->getLength() == 0) {
@@ -668,10 +665,10 @@ void ParseVisitor::checkNode(Node* node) {
 			}
 		}
 	} else if (node->getNodeType() == NodeOpExp) {
-		for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
-			node->getChildren()->at(i)->checkType(this);
-		}
 		if (node->getChildren()->getLength() == 2) {
+			for (unsigned i = 0; i < node->getChildren()->getLength(); i++) {
+				node->getChildren()->at(i)->checkType(this);
+			}
 			node->type = node->getChildren()->at(1)->type;
 		} else {
 			node->type = NoType;
@@ -763,7 +760,7 @@ void ParseVisitor::makeNode(Node* node) {
 			firstNode->makeCode(this); //EXP
 			String label1 = generateLabel();
 			String label2 = generateLabel();
-			tokenGenerator->getStream() << "JIN " << " #" << label1 << std::endl;
+			tokenGenerator->getStream() << "JIN " << "#" << label1 << std::endl;
 			node->getChildren()->at(1)->makeCode(this); //STATEMENT
 			tokenGenerator->getStream() << "JMP" << " #" << label2 << std::endl;
 			tokenGenerator->getStream() << "#" << label1 << " NOP" << std::endl;
@@ -772,9 +769,9 @@ void ParseVisitor::makeNode(Node* node) {
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordWhile) {
 			String label1 = generateLabel();
 			String label2 = generateLabel();
-			tokenGenerator->getStream() << " # " << label1 << " NOP" << std::endl;
+			tokenGenerator->getStream() << "#" << label1 << " NOP" << std::endl;
 			firstNode->makeCode(this); //EXP
-			tokenGenerator->getStream() << "JIN " << " #" << label2 << std::endl;
+			tokenGenerator->getStream() << "JIN " << "#" << label2 << std::endl;
 			node->getChildren()->at(1)->makeCode(this); //STATEMENT
 			tokenGenerator->getStream() << "JMP " << " #" << label1 << std::endl;
 			tokenGenerator->getStream() << "#" << label2 << " NOP" << std::endl;
@@ -785,9 +782,12 @@ void ParseVisitor::makeNode(Node* node) {
 			tokenGenerator->getStream() << "ADD " << std::endl;
 		}
 	} else if (node->getNodeType() == NodeExp) {
+		std::cout<<node->toString()<<std::endl;
 		if (node->getChildren()->at(1)->type == NoType) {
 			node->getChildren()->at(0)->makeCode(this); //EXP2
 		} else if (node->getChildren()->at(1)->type == OpGreater) {
+
+
 			node->getChildren()->at(1)->makeCode(this); //OP_EXP
 			node->getChildren()->at(0)->makeCode(this); //EXP2
 			tokenGenerator->getStream() << "LES" << std::endl;
@@ -829,8 +829,8 @@ void ParseVisitor::makeNode(Node* node) {
 			case TokenMinus: tokenGenerator->getStream() << "SUB " << std::endl; break;
 			case TokenAsterisk: tokenGenerator->getStream() << "MUL " << std::endl; break;
 			case TokenColon: tokenGenerator->getStream() << "DIV " << std::endl; break;
+			case TokenGreaterThan:break;
 			case TokenLessThan: tokenGenerator->getStream() << "LES " << std::endl; break;
-			case TokenGreaterThan: ; break;
 			case TokenAnd: tokenGenerator->getStream() << "AND " << std::endl; break;
 			case TokenEquals1: tokenGenerator->getStream() << "EQU " << std::endl; break;
 			case TokenEquals3: tokenGenerator->getStream() << "EQU " << std::endl; break;
