@@ -572,7 +572,7 @@ void ParseVisitor::checkNode(Node* node) {
 			node->type = NoType;
 		} else if (firstLeaf->getToken()->tokenType == TokenKeyWordRead) {
 			node->getChildren()->at(0)->checkType(this);
-			std::cout<<node->toString()<<std::endl;
+//			std::cout<<node->toString()<<std::endl;
 			NodeCheckType leafCheckType = static_cast<LexemToken*>(node->getLeafs()->at(2)->getToken())->symbolTableKeyReference->checkType;
 			NodeCheckType identCheckType = node->getChildren()->at(0)->type;
 			if (leafCheckType == NoType) {
